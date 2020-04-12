@@ -3,16 +3,27 @@
 namespace Statamic\Addons\Translator;
 
 use Statamic\Extend\Controller;
+use Statamic\API\Request;
 
 class TranslatorController extends Controller
 {
-    /**
-     * Maps to your route definition in routes.yaml
-     *
-     * @return mixed
-     */
-    public function index()
+    protected $translator;
+
+    public function __construct(Translator $translator)
     {
-        return $this->view('index');
+        parent::__construct();
+
+        $this->translator = $translator;
+    }
+    
+    public function index(string $uri): void
+    {
+        $locale = Request::input('locale');
+
+        if (empty($locale)) {
+            return;
+        }
+
+        $this->translator->translate($uri, $locale);
     }
 }
