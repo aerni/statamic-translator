@@ -1,25 +1,33 @@
-Vue.component('translator-fieldtype', {
+Vue.component("translator-fieldtype", {
+  mixins: [Fieldtype],
 
-    mixins: [Fieldtype],
+  template: `<button @click="translate" class="btn">Translate</button>`,
 
-    template: '<div>Translator</div>',
+  data: function () {
+    return {
+      //
+    };
+  },
 
-    data: function() {
-        return {
-            //
-        };
+  computed: {
+    //
+  },
+
+  methods: {
+    getUri: function () {
+      const path = window.location.pathname.split("/").slice(4);
+      const query = window.location.search;
+      return path + query;
     },
-
-    computed: {
-        //
+    translate: function () {
+      uri = this.getUri();
+      fetch(`/cp/addons/translator/translate/${uri}`).then(() => {
+        location.reload();
+      });
     },
+  },
 
-    methods: {
-        //
-    },
-
-    ready: function() {
-        //
-    }
-
+  ready: function () {
+    //
+  },
 });
