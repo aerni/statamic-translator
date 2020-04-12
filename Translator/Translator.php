@@ -54,7 +54,7 @@ class Translator
 
         $this->translateContent();
         $this->translateSlug();
-
+        
         $this->saveTranslation();
 
         return true;
@@ -71,8 +71,6 @@ class Translator
         $defaultData = $this->content->defaultData();
         // Get all the fields that are set to "localizable: true" in the fieldset.
         $localizableFields = $this->getLocalizableFields();
-
-        dd($localizableFields);
 
         // Get all the content that can be localized based on the default data and localizable fields.
         $localizableContent = array_intersect_key($defaultData, $localizableFields);
