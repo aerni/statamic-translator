@@ -23,6 +23,11 @@ class GoogleTranslate
         return $this->client->translate($text, ['source' => $source, 'target' => $target]);
     }
 
+    public function translateBatch(array $text, string $source, string $target)
+    {
+        return $this->client->translateBatch($text, ['source' => $source, 'target' => $target]);
+    }
+
     private function validateConfig(array $config)
     {
         if (! isset($config['api_key']) || $config['api_key'] === null) {

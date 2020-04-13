@@ -103,6 +103,33 @@ class Translator
 
         return true;
     }
+    
+    /**
+     * Translate the content in batch into the requested target locale.
+     * Return true when the translation was successul.
+     * 
+     * @return boolean
+     */
+    public function translateContentBatch(): bool
+    {
+        $flatContent = $this->contentToTranslate->flatten()->all();
+        // dd($flatContent);
+        $arrayKeys = $this->contentToTranslate->flip()->flatten()->all();
+        // dd($arrayKeys);
+
+        $translatedContentBatch = collect($this->googletranslate->translateBatch($flatContent, $this->sourceLocale, $this->targetLocale));
+        // dd($translatedContentBatch);
+
+        $flatTranslatedContent = $translatedContentBatch->map(function ($item) {
+            return $item['text'];
+        })->all();
+        // dd($flatTranslatedContent);
+
+        $this->translatedContent = collect(array_combine($arrayKeys, $flatTranslatedContent));
+        // dd($this->translatedContent);
+
+        return true;
+    }
 
     /**
      * Localize the slug.
