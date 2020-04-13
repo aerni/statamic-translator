@@ -4,12 +4,13 @@ namespace Statamic\Addons\Translator;
 
 use Statamic\API\Content;
 use Statamic\API\Str;
-use Stichoza\GoogleTranslate\GoogleTranslate;
+use Statamic\Addons\Translator\GoogleTranslate;
 
 // TODO: Check if translation works for all content types like pages, collections etc.
 // TODO: Add all fieldtypes that can be translated
 // TODO: Add the option to force translate all content
 // TODO: Add selection of fields that the user wants to translate.
+// TODO: Batch translate content instead of translating all strings separately.
 
 class Translator
 {
@@ -97,10 +98,7 @@ class Translator
     public function translateContent(): bool
     {
         $this->contentToTranslate->each(function ($item, $key) {
-            $this->translatedContent[$key] = $this->googletranslate
-                ->setSource($this->sourceLocale)
-                ->setTarget($this->targetLocale)
-                ->translate($item);
+            $this->translatedContent[$key] = $this->googletranslate->translate($item, $this->sourceLocale, $this->targetLocale)['text'];
         });
 
         return true;

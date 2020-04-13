@@ -13,7 +13,10 @@ class TranslatorServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->app->singleton(GoogleTranslate::class, function ($app) {
+            $apiKey = $this->getConfig('google_translate_api_key');
+            return new GoogleTranslate($apiKey);
+        });
     }
 
     /**

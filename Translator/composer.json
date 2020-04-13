@@ -1,6 +1,6 @@
 {
   "name": "michael-aerni/translator",
   "require": {
-    "stichoza/google-translate-php": "^4.1"
+    "google/cloud-translate": "^1.7"
   }
 }
