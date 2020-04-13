@@ -10,11 +10,15 @@ use Stichoza\GoogleTranslate\GoogleTranslate;
 // TODO: Add all fieldtypes that can be translated
 // TODO: Add the option to force translate all content
 // TODO: Add selection of fields that the user wants to translate.
-// TODO: Ommit title and slug translation when "localization: false"
 
 class Translator
 {
     protected $googletranslate;
+
+    protected $supportedFieldtypes = [
+        'text',
+        'textarea',
+    ];
 
     protected $uri;
     protected $targetLocale;
@@ -138,7 +142,7 @@ class Translator
     {
         $fields = collect($this->content->fieldset()->fields());
         $localizableFields = $fields->where('localizable', true);
-        
+
         /**
          * The title is always present and localizable in the CP.
          * It doesn't matter if the field is missing in the fieldset or if "localizable" is set to "false".
@@ -150,10 +154,15 @@ class Translator
                 'localizable' => true
             ]);
         }
-        
-        $localizableFields = $localizableFields->toArray();
 
-        return $localizableFields;
+        // Filter the fields by supported fieldtypes.
+        $filteredFields = $localizableFields->map(function ($item) {
+            if (in_array($item['type'], $this->supportedFieldtypes)) {
+                return $item;
+            }
+        })->filter()->all();
+
+        return $filteredFields;
     }
 
     /**
