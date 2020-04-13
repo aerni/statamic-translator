@@ -17,10 +17,11 @@ class Translator
     protected $googletranslate;
 
     protected $uri;
-    protected $locale;
+    protected $targetLocale;
 
     protected $content;
     protected $localizedContent;
+    protected $sourceLocale;
 
     protected $contentToTranslate;
     protected $translatedContent;
@@ -34,18 +35,20 @@ class Translator
      * Translate the requested URI based on the requested locale.
      *
      * @param string $uri
-     * @param string $locale
+     * @param string $targetLocale
      * @return boolean
      */
-    public function translate(string $uri, string $locale): bool
+    public function translate(string $uri, string $targetLocale): bool
     {
         $this->uri = $uri;
-        $this->locale = $locale;
+        $this->targetLocale = $targetLocale;
 
         // Get all the content associated with the URI.
         $this->content = Content::whereUri($uri);
         // Get all the content that has already been localized.
-        $this->localizedContent = $this->content->dataForLocale($this->locale);
+        $this->localizedContent = $this->content->dataForLocale($this->targetLocale);
+        // Get the source locale
+        $this->sourceLocale = $this->content->locale();
 
         // Get all the content to translate.
         $this->contentToTranslate = collect($this->getContentToTranslate());
@@ -82,7 +85,7 @@ class Translator
     }
 
     /**
-     * Translate the content into the given locale.
+     * Translate the content into the requested target locale.
      * Return true when the translation was successul.
      * 
      * @return boolean
@@ -90,7 +93,10 @@ class Translator
     public function translateContent(): bool
     {
         $this->contentToTranslate->each(function ($item, $key) {
-            $this->translatedContent[$key] = $this->googletranslate->setTarget($this->locale)->translate($item);
+            $this->translatedContent[$key] = $this->googletranslate
+                ->setSource($this->sourceLocale)
+                ->setTarget($this->targetLocale)
+                ->translate($item);
         });
 
         return true;
@@ -159,7 +165,7 @@ class Translator
     public function saveTranslation(): bool
     {
         $this->translatedContent->each(function ($item, $key) {
-            $this->content->in($this->locale)->set($key, $item);
+            $this->content->in($this->targetLocale)->set($key, $item);
         });
 
         $this->content->save();
