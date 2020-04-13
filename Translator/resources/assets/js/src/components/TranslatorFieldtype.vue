@@ -5,7 +5,7 @@ export default {
   mixins: [Fieldtype],
 
   template: 
-  `<button @click="translate" class="btn" :disabled="loading">
+  `<button @click="translate" class="btn" :disabled="loading || defaultLocale">
     <div v-show="!loading">
       <div class="flex items-center">
         <span class="mr-8 flex">
@@ -13,7 +13,7 @@ export default {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
           </svg>
         </span>
-        <span>Translate Content</span>
+        <span>Translate Page</span>
       </div>
     </div>
     <div v-show="loading">
@@ -37,6 +37,9 @@ export default {
   computed: {
     uri() {
       return this.getUri();
+    },
+    defaultLocale() {
+      return ! this.getUri().includes('locale');
     }
   },
 
