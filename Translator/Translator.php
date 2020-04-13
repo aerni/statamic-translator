@@ -53,7 +53,7 @@ class Translator
         $this->translatedContent = collect();
 
         $this->translateContent();
-        $this->translateSlug();
+        $this->localizeSlug();
         
         $this->saveTranslation();
 
@@ -75,7 +75,7 @@ class Translator
         // Get all the content that can be localized based on the default data and localizable fields.
         $localizableContent = array_intersect_key($defaultData, $localizableFields);
 
-        // Get all the content that has not yet been localized.
+        // Get all the content that has not yet been translated.
         $contentToTranslate = array_diff_key($localizableContent, $this->localizedContent);
 
         return $contentToTranslate;
@@ -97,23 +97,28 @@ class Translator
     }
 
     /**
-     * Translate the slug into the given locale.
+     * Localize the slug.
      * Return true when the translation was successul.
      *
      * @return bool
      */
-    public function translateSlug(): bool
-    {
+    public function localizeSlug(): bool
+    {   
         // Return false if the slug has already been translated.
         if (array_key_exists('slug', $this->localizedContent)) {
             return false;
         }
 
-        $desluggedUri = Str::deslugify($this->uri);
-        $translation = $this->googletranslate->setTarget($this->locale)->translate($desluggedUri);
-        $translatedSlug = Str::slug($translation);
+        // Get the title either from the already localized or the just translated content.
+        if (array_key_exists('title', $this->localizedContent)) {
+            $title = $this->localizedContent['title'];
+        } else {
+            $title = $this->translatedContent['title'];
+        }
 
-        $this->translatedContent['slug'] = $translatedSlug;
+        $slug = Str::slug($title);
+
+        $this->translatedContent['slug'] = $slug;
 
         return true;
     }
