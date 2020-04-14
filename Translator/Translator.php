@@ -114,7 +114,7 @@ class Translator
     {
         $flatContent = $this->contentToTranslate->flatten()->all();
         // dd($flatContent);
-        $arrayKeys = $this->contentToTranslate->flip()->flatten()->all();
+        $arrayKeys = $this->contentToTranslate->keys()->all();
         // dd($arrayKeys);
 
         $translatedContentBatch = collect($this->googletranslate->translateBatch($flatContent, $this->sourceLocale, $this->targetLocale));
