@@ -112,9 +112,9 @@ class Translator
      */
     public function translateContentBatch(): bool
     {
-        $flatContent = $this->contentToTranslate->flatten()->all();
+        $flatContent = $this->contentToTranslate->flatten()->toArray();
         // dd($flatContent);
-        $arrayKeys = $this->contentToTranslate->keys()->all();
+        $arrayKeys = $this->contentToTranslate->keys()->toArray();
         // dd($arrayKeys);
 
         $translatedContentBatch = collect($this->googletranslate->translateBatch($flatContent, $this->sourceLocale, $this->targetLocale));
@@ -122,7 +122,7 @@ class Translator
 
         $flatTranslatedContent = $translatedContentBatch->map(function ($item) {
             return $item['text'];
-        })->all();
+        })->toArray();
         // dd($flatTranslatedContent);
 
         $this->translatedContent = collect(array_combine($arrayKeys, $flatTranslatedContent));
