@@ -18,9 +18,9 @@ class GoogleTranslate
         ]);
     }
 
-    public function translate(string $text, string $source, string $target)
+    public function translate(string $text, string $source, string $target, string $format)
     {
-        return $this->client->translate($text, ['source' => $source, 'target' => $target]);
+        return $this->client->translate($text, ['source' => $source, 'target' => $target, 'format' => $format]);
     }
 
     public function translateBatch(array $text, string $source, string $target)
