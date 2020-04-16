@@ -5,6 +5,7 @@ namespace Statamic\Addons\Translator;
 use Statamic\API\Content;
 use Statamic\API\Str;
 use Statamic\Addons\Translator\GoogleTranslate;
+use Statamic\Addons\Translator\Helper;
 
 // TODO: Check if translation works for all content types like pages, collections etc.
 // TODO: Add all fieldtypes that can be translated
@@ -97,13 +98,27 @@ class Translator
      */
     public function translateContent(): bool
     {
-        $this->contentToTranslate->each(function ($item, $key) {
-            $this->translatedContent[$key] = $this->googletranslate->translate($item, $this->sourceLocale, $this->targetLocale)['text'];
-        });
+        $this->translatedContent = collect(Helper::array_map_recursive(
+            array($this, "translateValue"),
+            $this->contentToTranslate
+        ));
 
         return true;
     }
-    
+
+    public function translateValue($value)
+    {
+        /**
+         * Make sure to only translate when there's a value.
+         * Otherwise Google Translate will throw an Exception.
+         */
+        if (empty($value)) {
+            return;
+        }
+
+        return $this->googletranslate->translate($value, $this->sourceLocale, $this->targetLocale, 'text')['text'];
+    }
+
     /**
      * Translate the content in batch into the requested target locale.
      * Return true when the translation was successul.
