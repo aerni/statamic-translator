@@ -6,15 +6,15 @@ class Helper
 {
     static public function array_map_recursive($callback, $input) {
         $output = [];
-        foreach ($input as $key => $data) {
-            if (is_array($data)) {
-                $output[$key] = Self::array_map_recursive($callback, $data);
+        foreach ($input as $key => $value) {
+            if (is_array($value)) {
+                $output[$key] = Self::array_map_recursive($callback, $value);
             } else {
-                $output[$key] = $callback($data, $key);
+                $output[$key] = $callback($value, $key);
             }
         }
         return $output;
-    }
+    } 
 
     static public function multi_array_key_exists($key, array $array): bool
     {
@@ -66,6 +66,29 @@ class Helper
             }
         }
     
+        return $array;
+    }
+
+    static public function recursive_unset(&$array, $unwanted_key) {
+        unset($array[$unwanted_key]);
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                Self::recursive_unset($value, $unwanted_key);
+            }
+        }
+    }
+
+    static public function array_walk_recursive_delete(array &$array, callable $callback, $userdata = null)
+    {
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                $value = Self::array_walk_recursive_delete($value, $callback, $userdata);
+            }
+            if ($callback($value, $key, $userdata)) {
+                unset($array[$key]);
+            }
+        }
+     
         return $array;
     }
 }
