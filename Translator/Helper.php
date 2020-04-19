@@ -91,4 +91,8 @@ class Helper
      
         return $array;
     }
+
+    static public function has_number_keys(array $array) {
+        return count(array_filter(array_keys($array), 'is_numeric')) > 0;
+    }
 }
