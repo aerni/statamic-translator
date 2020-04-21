@@ -16,40 +16,35 @@ use Statamic\Addons\Translator\Helper;
 // TODO: Batch translate content instead of translating all strings separately.
 // TODO: Make sure content to translate does check for valid type recursively. Check with bard, replicator and grid.
 
-// DONE: Get localizable fields recursively from withing bard, grid and replicator.
-// TODO: The translatable content has to be filtered too.
-// TODO: Don't translate $key "type" when the $value is in $supportedFieldtypes.
-
 class Translator
 {
     protected $googletranslate;
 
     protected $supportedFieldtypes = [
-        // 'date',
-        // 'radio',
-        // 'checkboxes',
         'array',
         'bard',
+        'date',
         'grid',
         'list',
         'markdown',
-        // 'redactor',
+        'redactor',
         'replicator',
-        // 'table',
-        // 'tags',
+        'table',
+        'tags',
         'text',
         'textarea',
     ];
 
-    protected $uri;
+    protected $sourceLocale;
     protected $targetLocale;
 
     protected $content;
     protected $localizedContent;
-    protected $sourceLocale;
+
+    protected $localizableFields;
     protected $translatableFields;
-    protected $fields;
-    protected $sets;
+
+    protected $comparisonArrays;
 
     protected $contentToTranslate;
     protected $translatedContent;
@@ -68,28 +63,31 @@ class Translator
      */
     public function translate(string $uri, string $targetLocale): bool
     {
-        $this->uri = $uri;
-        $this->targetLocale = $targetLocale;
-
         // Get all the content associated with the URI.
         $this->content = Content::whereUri($uri);
 
-        // Get all the content that has already been localized.
-        $this->localizedContent = $this->content->dataForLocale($this->targetLocale);
-        // Get the source locale
+        // Get the source locale to translate from.
         $this->sourceLocale = $this->content->locale();
-
-        // Get all the content to translate.
+        // Get the target locale to translate into.
+        $this->targetLocale = $targetLocale;
+        
+        // Get the content that has already been localized into the target locale.
+        $this->localizedContent = $this->content->dataForLocale($this->targetLocale);
+        
+        // Get the content to translate.
         $this->contentToTranslate = $this->getContentToTranslate();
+
         // Create a collection for the translated content.
         $this->translatedContent = collect();
+
+        $this->comparisonArrays = $this->getComparisonArrays();
 
         $this->translatedContent = $this->translateContent();
         // $this->translateContentBatch();
         $this->localizeSlug();
 
         // dd($this->contentToTranslate);
-        // dd($this->translatedContent);
+        dd($this->translatedContent);
 
         $this->saveTranslation();
 
@@ -104,82 +102,35 @@ class Translator
     public function getContentToTranslate(): array
     {
         // Get all the fields that are localizable.
-        $localizableFields = $this->getLocalizableFields();
-        // dd($localizableFields);
+        $this->localizableFields = $this->getLocalizableFields();
+        
+        // Get all the fields that can be translated.
+        $this->translatableFields = $this->getTranslatableFields();
 
-        // Get all the fields that can be translated
-        $translatableFields = $this->getFieldsToTranslate($localizableFields);
-        // dd($translatableFields);
+        // Get all the content that is translatable.
+        $this->translatableContent = $this->getTranslatableContent();
 
-        $translatableContent = $this->getTranslatableContent($translatableFields);
-
-        // Get all the content that has not yet been translated.
-        // There's some limitations with Replicator and Bard because of how they work.
-        // It's not possible to only translate one set. Only to translate the whole Replicator/Bard.
-        $contentToTranslate = array_diff_key($translatableContent, $this->localizedContent);
-
-        dd($contentToTranslate);
-
-
-        return $contentToTranslate;
+        // Return all the content that has not yet been translated.
+        return array_diff_key($this->translatableContent, $this->localizedContent);
+    }
+    
+    private function getComparisonArrays(): array
+    {
+        return [
+            'fieldKeys' => $this->getTranslatableFieldKeys($this->translatableFields),
+            'setKeys' => $this->getBardAndReplicatorSetKeys($this->translatableFields),
+        ];
     }
 
-    public function getTranslatableContent(array $fields)
+    private function getTranslatableContent(): array
     {
-        // Get all the data from the content's .md file.
+        // Get the data from the content's .md file.
         $defaultData = $this->content->defaultData();
-        // dd($defaultData);
-        // dd($fields);
-        $topLevelContent = array_intersect_key($defaultData, $fields);
-        // dd($topLevelContent);
-
-        $this->fields = $fields;
-
-        // Replicator & Bard: If it doesn't have a $key within "sets" that is represented within the content as "type: $key" – delete it.
-        // Check in content: If key is array, check for $key "type", get its $value". Compare that value with the keys from the fieldset.
-        // The search needs to know where to look for the keys. Otherwise all keys will be supported.
-        // Type Array: If no defined "keys" in the fieldset, take whatever value is set in the content.
-
-        // dd($fields);
-        // $translatableContent = Helper::array_map_recursive(
-        //     function ($value, $key) use ($fields) {
-        //         // dd($key);
-        //         if (is_numeric($key) || Helper::multi_array_key_exists($key, $fields)) {
-        //             return $value;
-        //         }
-        //     },
-        //     $topLevelContent,
-        // );
-
-        $this->sets = $this->getSetsRecursive($fields);
-        // dd($this->sets);
-        // $translatableContent = $this->mapContent($topLevelContent);
-
-        // dd($translatableContent);
-
-        $filtered = $this->filterTranslatableContent($topLevelContent, $this->sets->toArray());
-
-        dd($filtered);
-
-        return $filtered;
-
+        
+        // Return the content that can be translated.
+        // This only works on first level. Bard/Replicator sets won't be filtered.
+        return array_intersect_key($defaultData, $this->translatableFields);
     }
-
-    public function filterTranslatableContent(array $content, array $fields)
-    {
-        $filtered = Helper::array_map_recursive(
-            function ($value, $key) use ($content) {
-                if (Helper::multi_array_key_exists($key, $content)) {
-                    dd($key, $value);
-                }
-            },
-            $fields
-        );
-
-        return $filtered;
-    }
-
-
 
     /**
      * This puts all the fields into the same structure as the content,
@@ -188,134 +139,113 @@ class Translator
      * @param array $fields
      * @return void
      */
-    public function getSetsRecursive(array $fields)
-    {
-        return collect($fields)->map(function ($item, $key) { 
+    // public function getSetsRecursive(array $fields): array
+    // {
+    //     return collect($fields)->map(function ($item, $key) { 
             
+    //         switch ($item['type']) {
+
+    //             case 'bard':
+    //             case 'replicator':
+    //                 $item['sets'] = collect($item['sets'])
+    //                     ->map(function ($set) {
+    //                         $set['fields'] = $this->getSetsRecursive($set['fields']);
+    //                         return $set;
+    //                     });
+    //                 break;
+    //             case 'grid':
+    //                 $item['fields'] = $this->getSetsRecursive($item['fields']);
+    //                 break;
+
+    //         }
+
+    //         switch ($item['type']) {
+
+    //             case 'bard':
+    //             case 'replicator':
+    //                 return collect($item['sets'])->map(function ($set, $key) {
+    //                     return $set['fields'];
+    //                 })->toArray();
+    //                 break;
+    //             case 'grid':
+    //                 return array_values([$item['fields']]);
+    //                 break;
+
+    //         }
+
+    //         return $key;
+
+    //     })->filter()->toArray();
+    // }
+
+    public function getTranslatableFieldKeys(array $fields): array
+    {
+        // dd($fields);
+        return collect($fields)->map(function ($item, $key) { 
+
             switch ($item['type']) {
 
                 case 'bard':
                 case 'replicator':
-                    $item['sets'] = collect($item['sets'])
+                    return collect($item['sets'])
                         ->map(function ($set) {
-                            $set['fields'] = $this->getSetsRecursive($set['fields'])->toArray();
-                            return $set;
+                            $set['fields'] = $this->getTranslatableFieldKeys($set['fields']);
+                            return $set['fields'];
                         });
                     break;
                 case 'grid':
-                    $item['fields'] = $this->getSetsRecursive($item['fields'])->toArray();
+                    $item['fields'] = $this->getTranslatableFieldKeys($item['fields']);
+                    return $item['fields'];
                     break;
-
-            }
-
-            switch ($item['type']) {
-
-                case 'bard':
-                case 'replicator':
-                    return collect($item['sets'])->map(function ($set, $key) {
-                        $fields = $set['fields'];
-                        return array_merge(['type' => $key], $fields);
-                    })->values()->toArray();
-                    break;
-                case 'grid':
-                    return array_values([$item['fields']]);
+                case 'array':
+                    if (array_key_exists('keys', $item)) {
+                        return $item['keys'];
+                    }
                     break;
 
             }
 
             return $key;
 
-        })
-        ->filter();
+        })->toArray();
+    }
+
+    public function getBardAndReplicatorSetKeys(array $fields): array
+    {
+        $sets = collect($fields)->map(function ($item) { 
+
+            switch ($item['type']) {
+
+                case 'bard':
+                case 'replicator':
+                    return collect($item['sets'])
+                        ->map(function ($set) {
+                            $set['fields'] = $this->getBardAndReplicatorSetKeys($set['fields']);
+                            return $set['fields'];
+                        });
+                    break;
+
+            }
+
+        })->toArray();
+
+        $arrays = array_values(Helper::array_filter_recursive($sets, function ($item) {
+            return is_array($item);
+        }));
+
+        $keys = Helper::array_keys_recursive($arrays);
+
+        $stringValues = array_values(array_filter($keys, function ($item) {
+            return !is_numeric($item);
+        }));
+
+        $setKeys = array_flip($stringValues);
+
+        return $setKeys;
     }
 
     /**
-     * This works for one level!!!
-     *
-     * @param array $fieldset
-     * @return void
-     */
-    public function getSets(array $fieldset)
-    {
-        $bard = collect();
-
-        foreach ($fieldset as $key => $value) {
-
-            if (is_array($value) && array_key_exists('sets', $value) && array_search('bard', $value, true) === 'type') {
-
-                $sets = collect($value['sets']);
-
-                $sets = $sets->map(function ($item, $key) {
-
-                    $fields = collect($item['fields'])->map(function ($item, $key) {
-                        return $key;
-                    })->toArray();
-
-                    return array_merge(['type' => $key], $fields);
-
-                })->values();
-
-                $bard->put($key, $sets);
-
-            }
-
-        }
-        
-        return $bard;
-    }
-
-    public function mapContent(array $content)
-    {
-        foreach ($content as $key => $value) {
-            // dd($value);
-            if (is_array($value) && Helper::has_number_keys($value)) {
-                $this->mapContent($value);
-            }
-            if (is_array($value)) {
-                $translatableContent = Helper::array_map_recursive(
-                function ($v, $k) use ($value) {
-                    if (is_array($v)) {
-                        $this->mapContent($k);
-                    }
-                    if (Helper::multi_array_key_exists($k, $this->fields)) {
-                        dd($k);
-                    }
-                },
-                $value,
-        );
-            }
-            collect($value)->map(function ($item) {
-
-                dd($item);
-            });
-
-            dd($value);
-            // if (is_array($value)) {
-            //     dd($value);
-            // }
-        }
-    }
-
-    // public function filterTranslatableContent(array $content)
-    // {
-    //     $filtered = Helper::array_filter_recursive($content, function ($item) {
-    //         if (isset($item)) {
-    //             return true;
-    //         }
-    //     });
-
-    //     $results = Helper::array_walk_recursive_delete($filtered, function ($value, $key) {
-    //         if (is_array($value)) {
-    //             return empty($value);
-    //         }
-    //         return ($value === null);
-    //     });
-        
-    //     return $filtered;
-    // }
-
-    /**
-     * Get all the localizable fields based on "localizable: true".
+     * Get all the localizable fieldset fields based on "localizable: true".
      *
      * @return array
      */
@@ -348,9 +278,9 @@ class Translator
      * @param array $fields
      * @return array
      */
-    private function getFieldsToTranslate(array $fields): array
+    private function getTranslatableFields(): array
     {
-        return $this->filterSupportedFieldtypes($fields)->toArray();
+        return $this->filterSupportedFieldtypes($this->localizableFields)->toArray();
     }
 
     /**
@@ -430,39 +360,48 @@ class Translator
      * @param string $value
      * @return string
      */
-    public function translateValue(string $value, string $key): string
+    public function translateValue($value, string $key)
     {
-        // Make sure to skip translation of values with the key of 'type'.
-        if ($key === 'type') {
+
+        if (! $this->isTranslatableKeyValuePair($value, $key)) {
             return $value;
         }
 
-        return $this->googletranslate->translate($value, $this->sourceLocale, $this->targetLocale, 'html')['text'];
+        // Translate HTML
+        if (Helper::isHtml($value)) {
+            return $this->googletranslate->translate($value, $this->sourceLocale, $this->targetLocale, 'html')['text'];
+        };
+
+        // Translate text
+        return $this->googletranslate->translate($value, $this->sourceLocale, $this->targetLocale, 'text')['text'];
     }
 
-    /**
-     * Translate the content in batch into the requested target locale.
-     * Return true when the translation was successul.
-     * 
-     * @return boolean
-     */
-    public function translateContentBatch(): bool
+    private function isTranslatableKeyValuePair($value, string $key): bool
     {
-        $flatContent = $this->contentToTranslate->flatten()->toArray();
-        // dd($flatContent);
-        $arrayKeys = $this->contentToTranslate->keys()->toArray();
-        // dd($arrayKeys);
+        // Skip empty $value.
+        if (empty($value)) {
+            return false;
+        }
 
-        $translatedContentBatch = collect($this->googletranslate->translateBatch($flatContent, $this->sourceLocale, $this->targetLocale));
-        // dd($translatedContentBatch);
+        // Skip numeric $value.
+        if (is_numeric($value)) {
+            return false;
+        }
 
-        $flatTranslatedContent = $translatedContentBatch->map(function ($item) {
-            return $item['text'];
-        })->toArray();
-        // dd($flatTranslatedContent);
+        // Skip boolean $value.
+        if (is_bool($value)) {
+            return false;
+        }
 
-        $this->translatedContent = collect(array_combine($arrayKeys, $flatTranslatedContent));
-        // dd($this->translatedContent);
+        // Skip "type: $value", where $value is a Bard/Replicator set key.
+        if ($key === 'type' && array_key_exists($value, $this->comparisonArrays['setKeys'])) {
+            return false;
+        }
+
+        // Skip when $key doesn't exists in the fieldset.
+        if (! Helper::multi_array_key_exists($key, $this->comparisonArrays['fieldKeys']) && ! is_numeric($key)) {
+            return false;
+        }
 
         return true;
     }
@@ -505,7 +444,7 @@ class Translator
             $this->content->in($this->targetLocale)->set($key, $value);
         }
 
-        $this->content->save();
+        $this->content->in($this->targetLocale)->save();
 
         return true;
     }

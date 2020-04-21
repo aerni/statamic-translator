@@ -95,4 +95,25 @@ class Helper
     static public function has_number_keys(array $array) {
         return count(array_filter(array_keys($array), 'is_numeric')) > 0;
     }
+
+    static public function search($array, $key, $value)
+    {
+        $results = array();
+    
+        if (is_array($array)) {
+            if (isset($array[$key]) && $array[$key] == $value) {
+                $results[] = $array;
+            }
+    
+            foreach ($array as $subarray) {
+                $results = array_merge($results, Self::search($subarray, $key, $value));
+            }
+        }
+    
+        return $results;
+    }
+
+    static public function isHtml($string) {
+        return $string != strip_tags($string) ? true:false;
+    }
 }
