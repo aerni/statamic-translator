@@ -2,37 +2,19 @@
 
 namespace Statamic\Addons\Translator;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\API\Content;
 use Statamic\API\Str;
 use Statamic\Addons\Translator\GoogleTranslate;
 use Statamic\Addons\Translator\Helper;
 
-// TODO: Check if translation works for all content types like pages, collections etc.
-// TODO: Add all fieldtypes that can be translated
-// TODO: Add the option to force translate all content
-// TODO: Add selection of fields that the user wants to translate.
-// TODO: Batch translate content instead of translating all strings separately.
-// TODO: Make sure content to translate does check for valid type recursively. Check with bard, replicator and grid.
-
 class Translator
 {
     protected $googletranslate;
 
     protected $supportedFieldtypes = [
-        'array',
-        'bard',
-        'date',
-        'grid',
-        'list',
-        'markdown',
-        'redactor',
-        'replicator',
-        'table',
-        'tags',
-        'text',
-        'textarea',
+        'array', 'bard', 'grid', 'list', 'markdown', 'redactor', 'replicator',
+        'table', 'tags', 'text', 'textarea',
     ];
 
     protected $sourceLocale;
@@ -44,7 +26,7 @@ class Translator
     protected $localizableFields;
     protected $translatableFields;
 
-    protected $comparisonArrays;
+    protected $fieldKeys;
 
     protected $contentToTranslate;
     protected $translatedContent;
@@ -80,14 +62,11 @@ class Translator
         // Create a collection for the translated content.
         $this->translatedContent = collect();
 
-        $this->comparisonArrays = $this->getComparisonArrays();
+        $this->fieldKeys = $this->getFieldKeys();
 
         $this->translatedContent = $this->translateContent();
-        // $this->translateContentBatch();
+        
         $this->localizeSlug();
-
-        // dd($this->contentToTranslate);
-        dd($this->translatedContent);
 
         $this->saveTranslation();
 
@@ -99,7 +78,7 @@ class Translator
      *
      * @return array
      */
-    public function getContentToTranslate(): array
+    private function getContentToTranslate(): array
     {
         // Get all the fields that are localizable.
         $this->localizableFields = $this->getLocalizableFields();
@@ -110,77 +89,48 @@ class Translator
         // Get all the content that is translatable.
         $this->translatableContent = $this->getTranslatableContent();
 
+        // Merge localized and translatable content.
+        return array_replace_recursive($this->translatableContent, $this->localizedContent);
+        
         // Return all the content that has not yet been translated.
-        return array_diff_key($this->translatableContent, $this->localizedContent);
-    }
-    
-    private function getComparisonArrays(): array
-    {
-        return [
-            'fieldKeys' => $this->getTranslatableFieldKeys($this->translatableFields),
-            'setKeys' => $this->getBardAndReplicatorSetKeys($this->translatableFields),
-        ];
+        // return array_diff_key($this->translatableContent, $this->localizedContent);
     }
 
+    /**
+     * Get the translatable content.
+     *
+     * @return array
+     */
     private function getTranslatableContent(): array
     {
         // Get the data from the content's .md file.
         $defaultData = $this->content->defaultData();
         
         // Return the content that can be translated.
-        // This only works on first level. Bard/Replicator sets won't be filtered.
         return array_intersect_key($defaultData, $this->translatableFields);
     }
 
     /**
-     * This puts all the fields into the same structure as the content,
-     * so we can compare it later.
+     * Get array of the keys of translatable fields.
+     *
+     * @return array
+     */
+    private function getFieldKeys(): array
+    {
+        return [
+            'allKeys' => $this->getTranslatableFieldKeys($this->translatableFields),
+            'setKeys' => $this->getTranslatableSetKeys($this->translatableFields),
+        ];
+    }
+
+    /**
+     * Get all the keys of translatable fields.
      *
      * @param array $fields
-     * @return void
+     * @return array
      */
-    // public function getSetsRecursive(array $fields): array
-    // {
-    //     return collect($fields)->map(function ($item, $key) { 
-            
-    //         switch ($item['type']) {
-
-    //             case 'bard':
-    //             case 'replicator':
-    //                 $item['sets'] = collect($item['sets'])
-    //                     ->map(function ($set) {
-    //                         $set['fields'] = $this->getSetsRecursive($set['fields']);
-    //                         return $set;
-    //                     });
-    //                 break;
-    //             case 'grid':
-    //                 $item['fields'] = $this->getSetsRecursive($item['fields']);
-    //                 break;
-
-    //         }
-
-    //         switch ($item['type']) {
-
-    //             case 'bard':
-    //             case 'replicator':
-    //                 return collect($item['sets'])->map(function ($set, $key) {
-    //                     return $set['fields'];
-    //                 })->toArray();
-    //                 break;
-    //             case 'grid':
-    //                 return array_values([$item['fields']]);
-    //                 break;
-
-    //         }
-
-    //         return $key;
-
-    //     })->filter()->toArray();
-    // }
-
-    public function getTranslatableFieldKeys(array $fields): array
+    private function getTranslatableFieldKeys(array $fields): array
     {
-        // dd($fields);
         return collect($fields)->map(function ($item, $key) { 
 
             switch ($item['type']) {
@@ -210,7 +160,13 @@ class Translator
         })->toArray();
     }
 
-    public function getBardAndReplicatorSetKeys(array $fields): array
+    /**
+     * Get all the keys of translatable Bard/Replicator sets.
+     *
+     * @param array $fields
+     * @return array
+     */
+    private function getTranslatableSetKeys(array $fields): array
     {
         $sets = collect($fields)->map(function ($item) { 
 
@@ -220,7 +176,7 @@ class Translator
                 case 'replicator':
                     return collect($item['sets'])
                         ->map(function ($set) {
-                            $set['fields'] = $this->getBardAndReplicatorSetKeys($set['fields']);
+                            $set['fields'] = $this->getTranslatableSetKeys($set['fields']);
                             return $set['fields'];
                         });
                     break;
@@ -233,15 +189,7 @@ class Translator
             return is_array($item);
         }));
 
-        $keys = Helper::array_keys_recursive($arrays);
-
-        $stringValues = array_values(array_filter($keys, function ($item) {
-            return !is_numeric($item);
-        }));
-
-        $setKeys = array_flip($stringValues);
-
-        return $setKeys;
+        return $arrays;
     }
 
     /**
@@ -249,7 +197,7 @@ class Translator
      *
      * @return array
      */
-    public function getLocalizableFields(): array
+    private function getLocalizableFields(): array
     {
         // Get all the fields from the fieldset.
         $fields = collect($this->content->fieldset()->fields());
@@ -259,7 +207,6 @@ class Translator
 
         /**
          * The title is always present and localizable in the CP.
-         * It doesn't matter if the field is missing in the fieldset or if "localizable" is set to "false".
          * This adds the title field, so we can translate it later. 
          */
         if (!$localizableFields->has('title')) {
@@ -342,16 +289,14 @@ class Translator
      * 
      * @return array
      */
-    public function translateContent(): array
+    private function translateContent(): array
     {
-        $translatedContent = Helper::array_map_recursive(
+        return Helper::array_map_recursive(
             function ($value, $key) {
                 return $this->translateValue($value, $key);
             },
             $this->contentToTranslate
         );
-
-        return $translatedContent;
     }
 
     /**
@@ -360,9 +305,9 @@ class Translator
      * @param string $value
      * @return string
      */
-    public function translateValue($value, string $key)
+    private function translateValue($value, string $key)
     {
-
+        // Check if '$key: $value' should be translated.
         if (! $this->isTranslatableKeyValuePair($value, $key)) {
             return $value;
         }
@@ -376,6 +321,13 @@ class Translator
         return $this->googletranslate->translate($value, $this->sourceLocale, $this->targetLocale, 'text')['text'];
     }
 
+    /**
+     * Check if the '$key: $value' should be translated.
+     *
+     * @param any $value
+     * @param string $key
+     * @return boolean
+     */
     private function isTranslatableKeyValuePair($value, string $key): bool
     {
         // Skip empty $value.
@@ -393,13 +345,23 @@ class Translator
             return false;
         }
 
-        // Skip "type: $value", where $value is a Bard/Replicator set key.
-        if ($key === 'type' && array_key_exists($value, $this->comparisonArrays['setKeys'])) {
+        // Skip 'type: text', which is Bard's default set.
+        if ($key === 'type' && $value === 'text') {
             return false;
         }
 
-        // Skip when $key doesn't exists in the fieldset.
-        if (! Helper::multi_array_key_exists($key, $this->comparisonArrays['fieldKeys']) && ! is_numeric($key)) {
+        // Skip 'type: $value', where $value is a Bard/Replicator set key.
+        if ($key === 'type' && Helper::multi_array_key_exists($value, $this->fieldKeys['setKeys'])) {
+            return false;
+        }
+
+        // Skip if $key doesn't exists in the fieldset.
+        if (! Helper::multi_array_key_exists($key, $this->fieldKeys['allKeys']) && ! is_numeric($key)) {
+            return false;
+        }
+
+        // Skip if $value is in the target locale.
+        if ($this->googletranslate->detectLanguage($value)['languageCode'] === $this->targetLocale) {
             return false;
         }
 
@@ -411,7 +373,7 @@ class Translator
      *
      * @return bool
      */
-    public function localizeSlug(): bool
+    private function localizeSlug(): bool
     {
         // Return false if the slug has already been translated.
         if (array_key_exists('slug', $this->localizedContent)) {
@@ -438,7 +400,7 @@ class Translator
      *
      * @return boolean
      */
-    public function saveTranslation(): bool
+    private function saveTranslation(): bool
     {
         foreach ($this->translatedContent as $key => $value) {
             $this->content->in($this->targetLocale)->set($key, $value);

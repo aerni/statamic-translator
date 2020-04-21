@@ -23,9 +23,9 @@ class GoogleTranslate
         return $this->client->translate($text, ['source' => $source, 'target' => $target, 'format' => $format]);
     }
 
-    public function translateBatch(array $text, string $source, string $target)
+    public function detectLanguage(string $text)
     {
-        return $this->client->translateBatch($text, ['source' => $source, 'target' => $target]);
+        return $this->client->detectLanguage($text);
     }
 
     private function validateConfig(array $config)
