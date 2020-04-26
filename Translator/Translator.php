@@ -35,18 +35,18 @@ class Translator
     {
         $this->googletranslate = $googletranslate;
     }
-
+    
     /**
-     * Translate the requested URI based on the requested locale.
+     * Translate the content associated with the requested ID.
      *
-     * @param string $uri
+     * @param string $id
      * @param string $targetLocale
      * @return boolean
      */
-    public function translate(string $uri, string $targetLocale): bool
+    public function translate(string $id, string $targetLocale): bool
     {
-        // Get all the content associated with the URI.
-        $this->content = Content::whereUri($uri);
+        // Get all the content associated with the ID.
+        $this->content = Content::find($id);
 
         // Get the source locale to translate from.
         $this->sourceLocale = $this->content->locale();
@@ -59,15 +59,16 @@ class Translator
         // Get the content to translate.
         $this->contentToTranslate = $this->getContentToTranslate();
 
-        // Create a collection for the translated content.
-        $this->translatedContent = collect();
-
+        // Get the keys of translatable fields.
         $this->fieldKeys = $this->getFieldKeys();
 
+        // Get the translated content.
         $this->translatedContent = $this->translateContent();
         
+        // Localize the slug.
         $this->localizeSlug();
 
+        // Save the translation.
         $this->saveTranslation();
 
         return true;
@@ -136,6 +137,13 @@ class Translator
             switch ($item['type']) {
 
                 case 'bard':
+                    return collect($item['sets'])
+                        ->map(function ($set) {
+                            $set['fields'] = $this->getTranslatableFieldKeys($set['fields']);
+                            return $set['fields'];
+                        })->put('text', []);;
+                    break;
+
                 case 'replicator':
                     return collect($item['sets'])
                         ->map(function ($set) {
@@ -143,10 +151,12 @@ class Translator
                             return $set['fields'];
                         });
                     break;
+
                 case 'grid':
                     $item['fields'] = $this->getTranslatableFieldKeys($item['fields']);
                     return $item['fields'];
                     break;
+                    
                 case 'array':
                     if (array_key_exists('keys', $item)) {
                         return $item['keys'];
@@ -167,12 +177,20 @@ class Translator
      * @return array
      */
     private function getTranslatableSetKeys(array $fields): array
-    {
+    {   
         $sets = collect($fields)->map(function ($item) { 
 
             switch ($item['type']) {
 
                 case 'bard':
+                    return collect($item['sets'])
+                        ->map(function ($set) {
+                            $set['fields'] = $this->getTranslatableSetKeys($set['fields']);
+                            return $set['fields'];
+                        })
+                        ->put('text', []);
+                    break;
+
                 case 'replicator':
                     return collect($item['sets'])
                         ->map(function ($set) {
@@ -342,11 +360,6 @@ class Translator
 
         // Skip boolean $value.
         if (is_bool($value)) {
-            return false;
-        }
-
-        // Skip 'type: text', which is Bard's default set.
-        if ($key === 'type' && $value === 'text') {
             return false;
         }
 
