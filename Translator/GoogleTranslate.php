@@ -18,14 +18,19 @@ class GoogleTranslate
         ]);
     }
 
-    public function translate(string $text, string $source, string $target, string $format)
+    public function translate(string $text, string $source, string $target, string $format): array
     {
         return $this->client->translate($text, ['source' => $source, 'target' => $target, 'format' => $format]);
     }
 
-    public function detectLanguage(string $text)
+    public function detectLanguage(string $text): array
     {
         return $this->client->detectLanguage($text);
+    }
+
+    public function supportedLanguages(): array
+    {
+        return $this->client->localizedLanguages();
     }
 
     private function validateConfig(array $config)
