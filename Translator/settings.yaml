@@ -1,0 +1,5 @@
+fields:
+  google_translation_api_key:
+    type: text
+    display: Google Translation API Key
+    instructions: Enter your Google Translation API key.
