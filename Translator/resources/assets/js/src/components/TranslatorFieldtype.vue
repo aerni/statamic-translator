@@ -71,12 +71,10 @@
         </div>
       </div>
     </div>
-    <small v-else class="help-block my-1">
-      <p>
-        {{ translate_choice('addons.Translator::fieldtype.api_key_instruction') }}
-        <a href="/cp/addons/translator/settings">{{ translate_choice('addons.Translator::fieldtype.addon_settings') }}</a>
-      </p>
-    </small>
+    <p v-else class="help-block my-1">
+      {{ translate_choice('addons.Translator::fieldtype.api_key_instruction') }}
+      <a href="/cp/addons/translator/settings">{{ translate_choice('addons.Translator::fieldtype.addon_settings') }}</a>
+    </p>
   </div>
 </template>
 
