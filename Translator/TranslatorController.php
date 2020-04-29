@@ -13,14 +13,9 @@ class TranslatorController extends Controller
     public function __construct(GoogleTranslate $googleTranslate, Translator $translator)
     {
         parent::__construct();
-
+ 
         $this->googleTranslate = $googleTranslate;
         $this->translator = $translator;
-    }
-
-    public function postSupportedLanguages(): array
-    {
-        return $this->googleTranslate->supportedLanguages();
     }
 
     public function postTranslate(Request $request): array

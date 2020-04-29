@@ -6,7 +6,6 @@ return [
 	'error_default_locale' => 'Can not translate the default locale.',
 	'error_language_unavailable' => 'This language is not available for translation.',
 	'error_unavailable' => 'Translator unavailable.',
-	'loading' => 'Loading',
 	'translate' => 'Translate Content',
 	'translating' => 'Translating',
 	'reload' => 'The page will automatically reload in 3 seconds.',

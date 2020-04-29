@@ -3,10 +3,18 @@
 namespace Statamic\Addons\Translator;
 
 use Statamic\Extend\Fieldtype;
+use Statamic\Addons\Translator\GoogleTranslate;
 
 class TranslatorFieldtype extends Fieldtype
 {
+    protected $googleTranslate;
+
     public $category = ['special'];
+
+    public function __construct(GoogleTranslate $googleTranslate)
+    {
+        $this->googleTranslate = $googleTranslate;
+    }
     
     /**
      * The blank/default value
@@ -26,7 +34,10 @@ class TranslatorFieldtype extends Fieldtype
      */
     public function preProcess($data)
     {
-        $data['api_key'] = $this->getConfig('google_translation_api_key');
+        $data = [
+            'apiKey' => $this->getConfig('google_translation_api_key'),
+            'supportedLanguages' => $this->googleTranslate->supportedLanguages(),
+        ];
 
         return $data;
     }
