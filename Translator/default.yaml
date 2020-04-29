@@ -1,1 +1,1 @@
-google_translate_api_key: '{env:GOOGLE_TRANSLATE_API_KEY}'
+google_translation_api_key: '{env:GOOGLE_TRANSLATION_API_KEY}'

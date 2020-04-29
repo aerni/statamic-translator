@@ -26,6 +26,8 @@ class TranslatorFieldtype extends Fieldtype
      */
     public function preProcess($data)
     {
+        $data['api_key'] = $this->getConfig('google_translation_api_key');
+
         return $data;
     }
 

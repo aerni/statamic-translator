@@ -16,7 +16,7 @@ class TranslatorServiceProvider extends ServiceProvider
         $this->app->singleton(GoogleTranslate::class, function ($app) {
 
             $config = [
-                'api_key' => $this->getConfig('google_translate_api_key'),
+                'api_key' => $this->getConfig('google_translation_api_key'),
             ];
             
             return new GoogleTranslate($config);
