@@ -93,7 +93,6 @@ export default {
       idle: true,
       translating: false,
       translated: false,
-      countDown: 3,
       error: [],
     };
   },
@@ -157,8 +156,7 @@ export default {
         this.idle = false,
         this.translating = false;
         this.translated = true;
-        this.startCountDown();
-        this.reloadPage(this.countDown * 1000);
+        this.reloadPage(3000);
       })
       .catch(error => {
         this.idle = false;
@@ -168,15 +166,6 @@ export default {
         console.log(this.error);
       });
       
-    },
-
-    startCountDown() {
-      if (this.countDown > 0) {
-        setTimeout(() => {
-          this.countDown -= 1
-          this.startCountDown()
-        }, 1000)
-      }
     },
 
     reloadPage(timeout) {
