@@ -36,7 +36,7 @@ class GoogleTranslate
     private function validateConfig(array $config)
     {
         if (! isset($config['api_key']) || $config['api_key'] === null) {
-            throw new Exception('Google API Key is required. Please set a valid API key in your config.');
+            throw new Exception('Missing Google Translation API Key. Please set a valid API key in the Translator addon settings.');
         }
     }
 }
