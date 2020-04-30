@@ -1,13 +1,14 @@
 <?php
 
 return [
-	'addon_settings' => 'Addon Settings',
-	'api_key_instruction' => 'Please enter your Google Translation API Key in the addon settings.',
-	'error_default_locale' => 'Can not translate the default locale.',
-	'error_language_unavailable' => 'This language is not available for translation.',
-	'error_unavailable' => 'Translator unavailable.',
+	'error_default_locale' => 'Can not translate the default locale',
+	'error_language_unavailable' => 'The translation of this language is not supported',
+	'error_unavailable' => 'Translator unavailable',
 	'translate' => 'Translate Content',
-	'translating' => 'Translating',
-	'reload' => 'The page will automatically reload in 3 seconds.',
-	'success' => 'Translation successful!',
+	'translating_title' => 'Translation in process',
+	'translating_message' => 'Please wait for the translation to finish',
+	'reload' => 'The page will reload in 3 seconds',
+	'success' => 'Translation successful',
+	'error_general' => 'An error occured',
+	'error_console' => 'Please check the console for further information',
 ];
