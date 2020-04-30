@@ -8,12 +8,21 @@
             ></flash-message>
         </div>
         <div v-else>
-            <div v-if="!isSupportedLanguage">
-                <flash-message 
-                    :title="translate_choice('addons.Translator::fieldtype.error_unavailable')" 
-                    :text="translate_choice('addons.Translator::fieldtype.error_language_unavailable')"
-                    type="alert" 
-                ></flash-message>
+            <div v-if="!isSupportedSourceLanguage || !isSupportedTargetLanguage">
+                <div v-if="!isSupportedSourceLanguage">
+                    <flash-message 
+                        :title="translate_choice('addons.Translator::fieldtype.error_unavailable')" 
+                        :text="translate_choice('addons.Translator::fieldtype.error_source_locale')"
+                        type="alert" 
+                    ></flash-message>
+                </div>
+                <div v-else>
+                    <flash-message 
+                        :title="translate_choice('addons.Translator::fieldtype.error_unavailable')" 
+                        :text="translate_choice('addons.Translator::fieldtype.error_target_locale')"
+                        type="alert" 
+                    ></flash-message>
+                </div>
             </div>
             <div v-else>
                 <div v-if="idle">
@@ -77,7 +86,12 @@ export default {
         isEditingDefaultLocale() {
             return this.currentLocale === this.defaultLocale;
         },
-        isSupportedLanguage() {
+        isSupportedSourceLanguage() {
+            return this.data.supportedLanguages.some(e => {
+                if (e.code === this.defaultLocale) return true;
+            });
+        },
+        isSupportedTargetLanguage() {
             return this.data.supportedLanguages.some(e => {
                 if (e.code === this.currentLocale) return true;
             });

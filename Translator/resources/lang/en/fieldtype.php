@@ -2,7 +2,8 @@
 
 return [
 	'error_default_locale' => 'Can not translate the default locale',
-	'error_language_unavailable' => 'The translation of this language is not supported',
+	'error_source_locale' => 'The default locale is not supported for translation',
+	'error_target_locale' => 'The current locale is not supported for translation',
 	'error_unavailable' => 'Translator unavailable',
 	'translate' => 'Translate Content',
 	'translating_title' => 'Translation in process',
