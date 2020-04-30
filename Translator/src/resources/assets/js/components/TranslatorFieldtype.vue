@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div style="background: #f1f5f9;">
         <div v-if="isEditingDefaultLocale">
             <flash-message 
                 :title="translate_choice('addons.Translator::fieldtype.error_unavailable')" 
                 :text="translate_choice('addons.Translator::fieldtype.error_default_locale')"
-                type="alert" 
+                type="info" 
             ></flash-message>
         </div>
         <div v-else>
@@ -13,27 +13,33 @@
                     <flash-message 
                         :title="translate_choice('addons.Translator::fieldtype.error_unavailable')" 
                         :text="translate_choice('addons.Translator::fieldtype.error_source_locale')"
-                        type="alert" 
+                        type="info" 
                     ></flash-message>
                 </div>
                 <div v-else>
                     <flash-message 
                         :title="translate_choice('addons.Translator::fieldtype.error_unavailable')" 
                         :text="translate_choice('addons.Translator::fieldtype.error_target_locale')"
-                        type="alert" 
+                        type="info" 
                     ></flash-message>
                 </div>
             </div>
             <div v-else>
                 <div v-if="idle">
-                    <span class="inline-flex rounded-md shadow-sm">
-                        <button @click="translate" type="button" class="inline-flex items-center px-2 py-1 border border-transparent text-sm leading-tight font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
-                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
-                            </svg>
-                            {{ translate_choice('addons.Translator::fieldtype.translate') }}
-                        </button>
-                    </span>
+                    <div class="rounded-md p-2 border">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.578a18.87 18.87 0 01-1.724 4.78c.29.354.596.696.914 1.026a1 1 0 11-1.44 1.389c-.188-.196-.373-.396-.554-.6a19.098 19.098 0 01-3.107 3.567 1 1 0 01-1.334-1.49 17.087 17.087 0 003.13-3.733 18.992 18.992 0 01-1.487-2.494 1 1 0 111.79-.89c.234.47.489.928.764 1.372.417-.934.752-1.913.997-2.927H3a1 1 0 110-2h3V3a1 1 0 011-1zm6 6a1 1 0 01.894.553l2.991 5.982a.869.869 0 01.02.037l.99 1.98a1 1 0 11-1.79.895L15.383 16h-4.764l-.724 1.447a1 1 0 11-1.788-.894l.99-1.98.019-.038 2.99-5.982A1 1 0 0113 8zm-1.382 6h2.764L13 11.236 11.618 14z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-2">
+                                <button @click="translate" type="button" class="btn btn-default">
+                                    {{ translate_choice('addons.Translator::fieldtype.translate') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div v-if="translating">
                     <flash-message 
