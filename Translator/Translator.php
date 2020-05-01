@@ -94,10 +94,12 @@ class Translator
         $this->translatableContent = $this->getTranslatableContent();
 
         // Merge localized and translatable content.
-        return array_replace_recursive($this->translatableContent, $this->localizedContent);
-        
-        // Return all the content that has not yet been translated.
-        // return array_diff_key($this->translatableContent, $this->localizedContent);
+        $mergedContent = array_replace_recursive($this->translatableContent, $this->localizedContent);
+
+        // Remove ID and slug from the content to translate.
+        unset($mergedContent['id'], $mergedContent['slug']);
+
+        return $mergedContent;
     }
 
     /**
