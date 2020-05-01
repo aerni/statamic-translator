@@ -71,8 +71,8 @@ class Translator
         // Get the translated content.
         $this->translatedContent = $this->translateContent();
         
-        // Localize the slug.
-        $this->localizeSlug();
+        // Translate the slug.
+        $this->translateSlug();
 
         // Save the translation.
         $this->saveTranslation();
@@ -410,25 +410,30 @@ class Translator
     }
 
     /**
-     * Localize the slug. Return true when successul.
+     * Translate the slug. Return true when successul.
      *
      * @return bool
      */
-    private function localizeSlug(): bool
+    private function translateSlug(): bool
     {
-        // Return false if the slug has already been translated.
+        // Globals shouldn't have a slug saved to file.
+        if ($this->contentType === 'globals') {
+            return false;
+        }
+
+        // Return false if the slug has already been localized.
         if (array_key_exists('slug', $this->localizedContent)) {
             return false;
         }
 
-        // Get the title from the translated content.
-        $title = $this->translatedContent['title'];
+        // Deslugged slug from the unlocalized default content.
+        $desluggedSlug = Str::deslugify($this->content->slug());
 
-        // Create slug from title
-        $slug = Str::slug($title);
+        // Translate the deslugged slug.
+        $translation = $this->googletranslate->translate($desluggedSlug, $this->sourceLocale, $this->targetLocale, 'text')['text'];
 
-        // Save the slug to the translated content
-        $this->translatedContent['slug'] = $slug;
+        // Save translated slug to the translated content.
+        $this->translatedContent['slug'] = Str::slug($translation);
 
         return true;
     }
