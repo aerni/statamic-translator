@@ -49,6 +49,8 @@ class TranslatorFieldtype extends Fieldtype
      */
     public function process($data)
     {
+        unset($data['supportedLanguages']);
+        
         return $data;
     }
 }
