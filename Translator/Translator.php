@@ -103,6 +103,44 @@ class Translator
     }
 
     /**
+     * Get all the localizable fieldset fields based on "localizable: true".
+     *
+     * @return array
+     */
+    private function getLocalizableFields(): array
+    {
+        // Get all the fields from the fieldset.
+        $fields = collect($this->content->fieldset()->fields());
+
+        // Get all the fields where "localizable: true".
+        $localizableFields = $fields->where('localizable', true);
+
+        /**
+         * The title is always present and localizable in the CP.
+         * This adds the title field, so we can translate it later. 
+         */
+        if (!$localizableFields->has('title')) {
+            $localizableFields->put('title', [
+                'type' => 'text',
+                'localizable' => true
+            ]);
+        };
+
+        return $localizableFields->toArray();
+    }
+
+    /**
+     * Get all the fields supported for translation.
+     *
+     * @param array $fields
+     * @return array
+     */
+    private function getSupportedFields(): array
+    {
+        return $this->filterSupportedFieldtypes($this->localizableFields)->toArray();
+    }
+
+    /**
      * Get the translatable content.
      *
      * @return array
@@ -124,6 +162,58 @@ class Translator
             'allKeys' => $this->getTranslatableFieldKeys($this->supportedFields),
             'setKeys' => $this->getTranslatableSetKeys($this->supportedFields),
         ];
+    }
+
+    /**
+     * Filter the fields by supported fieldtypes.
+     *
+     * @param array $fields
+     * @return collection
+     */
+    private function filterSupportedFieldtypes(array $fields): collection
+    {
+        return collect($fields)
+            ->map(function ($item) {
+                switch ($item['type']) {
+                    case 'replicator':
+                    case 'bard':
+                        $item['sets'] = collect($item['sets'] ?? [])
+                            ->map(function ($set) {
+                                $set['fields'] = $this->filterSupportedFieldtypes($set['fields'])->toArray();
+                                return $set;
+                            })
+                            ->filter(function ($set) {
+                                return count($set['fields']) > 0;
+                            })
+                            ->toArray();
+                        break;
+                    case 'grid':
+                        $item['fields'] = $this->filterSupportedFieldtypes($item['fields'] ?? [])->toArray();
+                        break;
+                }
+
+                return $item;
+            })
+            ->filter(function ($item) {
+                $supported = in_array($item['type'], $this->supportedFieldtypes);
+
+                if (!$supported) {
+                    return false;
+                }
+
+                switch ($item['type']) {
+                    case 'replicator':
+                        return count($item['sets'] ?? []) > 0;
+                        break;
+                    case 'grid':
+                        return count($item['fields'] ?? []) > 0;
+                        break;
+                    default:
+                        break;
+                }
+
+                return true;
+            });
     }
 
     /**
@@ -210,96 +300,6 @@ class Translator
         }));
 
         return $arrays;
-    }
-
-    /**
-     * Get all the localizable fieldset fields based on "localizable: true".
-     *
-     * @return array
-     */
-    private function getLocalizableFields(): array
-    {
-        // Get all the fields from the fieldset.
-        $fields = collect($this->content->fieldset()->fields());
-
-        // Get all the fields where "localizable: true".
-        $localizableFields = $fields->where('localizable', true);
-
-        /**
-         * The title is always present and localizable in the CP.
-         * This adds the title field, so we can translate it later. 
-         */
-        if (!$localizableFields->has('title')) {
-            $localizableFields->put('title', [
-                'type' => 'text',
-                'localizable' => true
-            ]);
-        };
-
-        return $localizableFields->toArray();
-    }
-
-    /**
-     * Get all the fields supported for translation.
-     *
-     * @param array $fields
-     * @return array
-     */
-    private function getSupportedFields(): array
-    {
-        return $this->filterSupportedFieldtypes($this->localizableFields)->toArray();
-    }
-
-    /**
-     * Filter the fields by supported fieldtypes.
-     *
-     * @param array $fields
-     * @return collection
-     */
-    private function filterSupportedFieldtypes(array $fields): collection
-    {
-        return collect($fields)
-            ->map(function ($item) {
-                switch ($item['type']) {
-                    case 'replicator':
-                    case 'bard':
-                        $item['sets'] = collect($item['sets'] ?? [])
-                            ->map(function ($set) {
-                                $set['fields'] = $this->filterSupportedFieldtypes($set['fields'])->toArray();
-                                return $set;
-                            })
-                            ->filter(function ($set) {
-                                return count($set['fields']) > 0;
-                            })
-                            ->toArray();
-                        break;
-                    case 'grid':
-                        $item['fields'] = $this->filterSupportedFieldtypes($item['fields'] ?? [])->toArray();
-                        break;
-                }
-
-                return $item;
-            })
-            ->filter(function ($item) {
-                $supported = in_array($item['type'], $this->supportedFieldtypes);
-
-                if (!$supported) {
-                    return false;
-                }
-
-                switch ($item['type']) {
-                    case 'replicator':
-                        return count($item['sets'] ?? []) > 0;
-                        break;
-                    case 'grid':
-                        return count($item['fields'] ?? []) > 0;
-                        break;
-                    default:
-                        break;
-                }
-
-                return true;
-            });
     }
 
     /**
