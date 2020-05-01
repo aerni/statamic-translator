@@ -393,15 +393,13 @@ class Translator
             return false;
         }
 
-        // Get the title either from the already localized or the just translated content.
-        if (array_key_exists('title', $this->localizedContent)) {
-            $title = $this->localizedContent['title'];
-        } else {
-            $title = $this->translatedContent['title'];
-        }
+        // Get the title from the translated content.
+        $title = $this->translatedContent['title'];
 
+        // Create slug from title
         $slug = Str::slug($title);
 
+        // Save the slug to the translated content
         $this->translatedContent['slug'] = $slug;
 
         return true;
