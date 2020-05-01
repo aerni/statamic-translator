@@ -21,6 +21,7 @@ class Translator
     protected $targetLocale;
 
     protected $content;
+    protected $defaultContent;
     protected $localizedContent;
 
     protected $localizableFields;
@@ -53,6 +54,8 @@ class Translator
         // Get the target locale to translate into.
         $this->targetLocale = $targetLocale;
         
+        // Get the unlocalized default content in the source locale
+        $this->defaultContent = $this->content->defaultData();
         // Get the content that has already been localized into the target locale.
         $this->localizedContent = $this->content->dataForLocale($this->targetLocale);
         
@@ -103,12 +106,9 @@ class Translator
      * @return array
      */
     private function getTranslatableContent(): array
-    {
-        // Get the data from the content's .md file.
-        $defaultData = $this->content->defaultData();
-        
-        // Return the content that can be translated.
-        return array_intersect_key($defaultData, $this->translatableFields);
+    {        
+        // Return the content that can be translated. Only first level. No recursion into Bard/Replicator sets.
+        return array_intersect_key($this->defaultContent, $this->translatableFields);
     }
 
     /**
@@ -264,7 +264,6 @@ class Translator
                         $item['sets'] = collect($item['sets'] ?? [])
                             ->map(function ($set) {
                                 $set['fields'] = $this->filterSupportedFieldtypes($set['fields'])->toArray();
-
                                 return $set;
                             })
                             ->filter(function ($set) {
