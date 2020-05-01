@@ -25,7 +25,7 @@ class Translator
     protected $localizedContent;
 
     protected $localizableFields;
-    protected $translatableFields;
+    protected $supportedFields;
 
     protected $fieldKeys;
 
@@ -87,8 +87,8 @@ class Translator
         // Get all the fields that are localizable.
         $this->localizableFields = $this->getLocalizableFields();
         
-        // Get all the fields that can be translated.
-        $this->translatableFields = $this->getTranslatableFields();
+        // Get all the supported fields that can be translated.
+        $this->supportedFields = $this->getSupportedFields();
 
         // Get all the content that is translatable.
         $this->translatableContent = $this->getTranslatableContent();
@@ -108,7 +108,7 @@ class Translator
     private function getTranslatableContent(): array
     {        
         // Return the content that can be translated. Only first level. No recursion into Bard/Replicator sets.
-        return array_intersect_key($this->defaultContent, $this->translatableFields);
+        return array_intersect_key($this->defaultContent, $this->supportedFields);
     }
 
     /**
@@ -119,8 +119,8 @@ class Translator
     private function getFieldKeys(): array
     {
         return [
-            'allKeys' => $this->getTranslatableFieldKeys($this->translatableFields),
-            'setKeys' => $this->getTranslatableSetKeys($this->translatableFields),
+            'allKeys' => $this->getTranslatableFieldKeys($this->supportedFields),
+            'setKeys' => $this->getTranslatableSetKeys($this->supportedFields),
         ];
     }
 
@@ -238,12 +238,12 @@ class Translator
     }
 
     /**
-     * Get all the translatable fields.
+     * Get all the fields supported for translation.
      *
      * @param array $fields
      * @return array
      */
-    private function getTranslatableFields(): array
+    private function getSupportedFields(): array
     {
         return $this->filterSupportedFieldtypes($this->localizableFields)->toArray();
     }
