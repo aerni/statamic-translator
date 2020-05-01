@@ -83,28 +83,35 @@ export default {
     },
 
     computed: {
+
         defaultLocale() {
             return Object.keys(Statamic.locales)[0];
         },
+        
         currentLocale() {
             return Statamic.Publish ? (Statamic.Publish.locale || defaultLocale) : defaultLocale;
         },
+        
         isEditingDefaultLocale() {
             return this.currentLocale === this.defaultLocale;
         },
+        
         isSupportedSourceLanguage() {
             return this.data.supportedLanguages.some(e => {
                 if (e.code === this.defaultLocale) return true;
             });
         },
+        
         isSupportedTargetLanguage() {
             return this.data.supportedLanguages.some(e => {
                 if (e.code === this.currentLocale) return true;
             });
         },
+
         id() {
-            return Statamic.Publish.contentData.id;
-        }
+            return this.$parent.$parent.$parent.$parent.uuid;
+        },
+
     },
 
     methods: {
