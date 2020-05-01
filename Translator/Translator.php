@@ -21,6 +21,7 @@ class Translator
     protected $targetLocale;
 
     protected $content;
+    protected $contentType;
     protected $defaultContent;
     protected $localizedContent;
 
@@ -48,6 +49,8 @@ class Translator
     {
         // Get all the content associated with the ID.
         $this->content = Content::find($id);
+        // Get the type of the content.
+        $this->contentType = $this->content->contentType();
 
         // Get the source locale to translate from.
         $this->sourceLocale = $this->content->locale();
@@ -58,7 +61,7 @@ class Translator
         $this->defaultContent = $this->content->defaultData();
         // Get the content that has already been localized into the target locale.
         $this->localizedContent = $this->content->dataForLocale($this->targetLocale);
-        
+
         // Get the content to translate.
         $this->contentToTranslate = $this->getContentToTranslate();
 
@@ -96,8 +99,8 @@ class Translator
         // Merge localized and translatable content.
         $mergedContent = array_replace_recursive($this->translatableContent, $this->localizedContent);
 
-        // Remove ID and slug from the content to translate.
-        unset($mergedContent['id'], $mergedContent['slug']);
+        // Unset fields that shouldn't be translated.
+        $mergedContent = $this->unsetFields($mergedContent);
 
         return $mergedContent;
     }
@@ -119,7 +122,7 @@ class Translator
          * The title is always present and localizable in the CP.
          * This adds the title field, so we can translate it later. 
          */
-        if (!$localizableFields->has('title')) {
+        if (!$localizableFields->has('title') && $this->contentType !== 'globals') {
             $localizableFields->put('title', [
                 'type' => 'text',
                 'localizable' => true
@@ -149,6 +152,30 @@ class Translator
     {        
         // Return the content that can be translated. Only first level. No recursion into Bard/Replicator sets.
         return array_intersect_key($this->defaultContent, $this->supportedFields);
+    }
+
+    /**
+     * Unset fields that shouldn't be translated.
+     *
+     * @param array $array
+     * @return array
+     */
+    private function unsetFields(array $array): array
+    {
+        // Remove slug from the content to translate.
+        if ($this->contentType === 'entry') {
+            unset($array['slug']);
+        }
+        
+        // Remove slug from the content to translate.
+        if ($this->contentType === 'page') {
+            unset($array['slug']);
+        }
+        
+        // Remove ID from the content to translate.
+        unset($array['id']);
+
+        return $array;
     }
 
     /**
