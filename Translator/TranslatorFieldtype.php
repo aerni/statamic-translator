@@ -3,17 +3,17 @@
 namespace Statamic\Addons\Translator;
 
 use Statamic\Extend\Fieldtype;
-use Statamic\Addons\Translator\GoogleTranslate;
+use Statamic\Addons\Translator\Contracts\TranslationService;
 
 class TranslatorFieldtype extends Fieldtype
 {
-    protected $googleTranslate;
+    private $service;
 
     public $category = ['special'];
 
-    public function __construct(GoogleTranslate $googleTranslate)
+    public function __construct(TranslationService $service)
     {
-        $this->googleTranslate = $googleTranslate;
+        $this->service = $service;
     }
     
     /**
@@ -35,7 +35,7 @@ class TranslatorFieldtype extends Fieldtype
     public function preProcess($data)
     {
         $data = [
-            'supportedLanguages' => $this->googleTranslate->supportedLanguages(),
+            'supportedLanguages' => $this->service->supportedLanguages(),
         ];
 
         return $data;

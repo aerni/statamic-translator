@@ -5,12 +5,12 @@ namespace Statamic\Addons\Translator;
 use Illuminate\Support\Collection;
 use Statamic\API\Content;
 use Statamic\API\Str;
-use Statamic\Addons\Translator\GoogleTranslate;
+use Statamic\Addons\Translator\Contracts\TranslationService;
 use Statamic\Addons\Translator\Helper;
 
 class Translator
 {
-    protected $googletranslate;
+    protected $service;
 
     protected $supportedFieldtypes = [
         'array', 'bard', 'grid', 'list', 'markdown', 'redactor', 'replicator',
@@ -33,9 +33,9 @@ class Translator
     protected $contentToTranslate;
     protected $translatedContent;
 
-    public function __construct(GoogleTranslate $googletranslate)
+    public function __construct(TranslationService $service)
     {
-        $this->googletranslate = $googletranslate;
+        $this->service = $service;
     }
     
     /**
@@ -360,11 +360,11 @@ class Translator
 
         // Translate HTML
         if (Helper::isHtml($value)) {
-            return $this->googletranslate->translate($value, $this->sourceLocale, $this->targetLocale, 'html')['text'];
+            return $this->service->translateText($value, $this->targetLocale, 'html');
         };
 
         // Translate text
-        return $this->googletranslate->translate($value, $this->sourceLocale, $this->targetLocale, 'text')['text'];
+        return $this->service->translateText($value, $this->targetLocale, 'text');
     }
 
     /**
@@ -402,7 +402,7 @@ class Translator
         }
 
         // Skip if $value is in the target locale.
-        if ($this->googletranslate->detectLanguage($value)['languageCode'] === $this->targetLocale) {
+        if ($this->service->detectLanguage($value) === $this->targetLocale) {
             return false;
         }
 
@@ -430,7 +430,7 @@ class Translator
         $desluggedSlug = Str::deslugify($this->content->slug());
 
         // Translate the deslugged slug.
-        $translation = $this->googletranslate->translate($desluggedSlug, $this->sourceLocale, $this->targetLocale, 'text')['text'];
+        $translation = $this->service->translateText($desluggedSlug, $this->targetLocale, 'text');
 
         // Save translated slug to the translated content.
         $this->translatedContent['slug'] = Str::slug($translation);

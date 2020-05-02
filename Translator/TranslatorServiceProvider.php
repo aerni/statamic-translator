@@ -3,6 +3,11 @@
 namespace Statamic\Addons\Translator;
 
 use Statamic\Extend\ServiceProvider;
+use Google\Cloud\Translate\V2\TranslateClient;
+use Google\Cloud\Translate\V3\TranslationServiceClient;
+use Statamic\Addons\Translator\Contracts\TranslationService;
+use Statamic\Addons\Translator\Services\GoogleAdvancedTranslationService;
+use Statamic\Addons\Translator\Services\GoogleBasicTranslationService;
 
 class TranslatorServiceProvider extends ServiceProvider
 {
@@ -13,14 +18,36 @@ class TranslatorServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->singleton(GoogleTranslate::class, function ($app) {
+        $translationService = $this->getConfig('translation_service');
 
-            $config = [
-                'api_key' => $this->getConfig('google_translation_api_key'),
-            ];
+        if ($translationService === 'google_basic') {
+
+            $this->app->singleton(TranslationService::class, GoogleBasicTranslationService::class);
+
+            $this->app->singleton(TranslateClient::class, function ($app) {
+                return new TranslateClient([
+                    'key' => $this->getConfig('google_translation_api_key'),
+                ]);
+            });
+
+        }
+
+        if ($translationService === 'google_advanced') {
+
+            $this->app->singleton(TranslationService::class, function ($app) {
+                return new GoogleAdvancedTranslationService(
+                    $this->app->make(TranslationServiceClient::class),
+                    $this->getConfig('google_cloud_project')
+                );
+            });
             
-            return new GoogleTranslate($config);
-        });
+            $this->app->singleton(TranslationServiceClient::class, function ($app) {
+                return new TranslationServiceClient([
+                    'credentials' => $this->getConfig('google_application_credentials'),
+                ]);
+            });
+
+        }
     }
 
     /**

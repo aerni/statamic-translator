@@ -97,14 +97,14 @@ export default {
         },
         
         isSupportedSourceLanguage() {
-            return this.data.supportedLanguages.some(e => {
-                if (e.code === this.defaultLocale) return true;
+            return this.data.supportedLanguages.find(language => {
+                if (language === this.defaultLocale) return true;
             });
         },
         
         isSupportedTargetLanguage() {
-            return this.data.supportedLanguages.some(e => {
-                if (e.code === this.currentLocale) return true;
+            return this.data.supportedLanguages.find(language => {
+                if (language === this.currentLocale) return true;
             });
         },
 
