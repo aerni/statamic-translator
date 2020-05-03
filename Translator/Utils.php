@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Translator;
 
-class Helper
+class Utils
 {
     static public function array_map_recursive($callback, $input) {
         $output = [];

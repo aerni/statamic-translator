@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\API\Content;
 use Statamic\API\Str;
 use Statamic\Addons\Translator\Contracts\TranslationService;
-use Statamic\Addons\Translator\Helper;
+use Statamic\Addons\Translator\Utils;
 
 class Translator
 {
@@ -319,7 +319,7 @@ class Translator
 
         })->toArray();
 
-        $arrays = array_values(Helper::array_filter_recursive($sets, function ($item) {
+        $arrays = array_values(Utils::array_filter_recursive($sets, function ($item) {
             return is_array($item);
         }));
 
@@ -334,7 +334,7 @@ class Translator
      */
     private function translateContent(): array
     {
-        return Helper::array_map_recursive(
+        return Utils::array_map_recursive(
             function ($value, $key) {
                 return $this->translateValue($value, $key);
             },
@@ -356,7 +356,7 @@ class Translator
         }
 
         // Translate HTML
-        if (Helper::isHtml($value)) {
+        if (Utils::isHtml($value)) {
             return $this->service->translateText($value, $this->targetLocale, 'html');
         };
 
@@ -389,12 +389,12 @@ class Translator
         }
 
         // Skip 'type: $value', where $value is a Bard/Replicator set key.
-        if ($key === 'type' && Helper::multi_array_key_exists($value, $this->fieldKeys['setKeys'])) {
+        if ($key === 'type' && Utils::multi_array_key_exists($value, $this->fieldKeys['setKeys'])) {
             return false;
         }
 
         // Skip if $key doesn't exists in the fieldset.
-        if (! Helper::multi_array_key_exists($key, $this->fieldKeys['allKeys']) && ! is_numeric($key)) {
+        if (! Utils::multi_array_key_exists($key, $this->fieldKeys['allKeys']) && ! is_numeric($key)) {
             return false;
         }
 
