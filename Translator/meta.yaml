@@ -3,3 +3,6 @@ version: '1.0'
 developer: 'Michael Aerni'
 developer_url: 'https://www.michaelaerni.ch'
 commercial: true
+fieldtype_fields:
+  button_text:
+    type: text

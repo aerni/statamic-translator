@@ -35,6 +35,7 @@ class TranslatorFieldtype extends Fieldtype
     public function preProcess($data)
     {
         $data = [
+            'buttonText' => $this->getFieldConfig('button_text'),
             'supportedLanguages' => $this->service->supportedLanguages(),
         ];
 

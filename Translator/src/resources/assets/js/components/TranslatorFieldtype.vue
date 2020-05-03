@@ -35,7 +35,7 @@
                             </div>
                             <div class="ml-2">
                                 <button @click="translate" type="button" class="btn btn-default">
-                                    {{ translate_choice('addons.Translator::fieldtype.translate') }}
+                                    {{ buttonText }}
                                 </button>
                             </div>
                         </div>
@@ -110,6 +110,10 @@ export default {
 
         id() {
             return this.$parent.$parent.$parent.$parent.uuid;
+        },
+
+        buttonText() {
+            return this.data.buttonText ? this.data.buttonText : translate_choice('addons.Translator::fieldtype.translate');
         },
 
     },
