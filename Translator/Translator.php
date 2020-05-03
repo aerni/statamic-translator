@@ -17,7 +17,6 @@ class Translator
         'table', 'tags', 'text', 'textarea',
     ];
 
-    protected $sourceLocale;
     protected $targetLocale;
 
     protected $content;
@@ -52,12 +51,10 @@ class Translator
         // Get the type of the content.
         $this->contentType = $this->content->contentType();
 
-        // Get the source locale to translate from.
-        $this->sourceLocale = $this->content->locale();
         // Get the target locale to translate into.
         $this->targetLocale = $targetLocale;
         
-        // Get the unlocalized default content in the source locale
+        // Get the unlocalized default content.
         $this->defaultContent = $this->content->defaultData();
         // Get the content that has already been localized into the target locale.
         $this->localizedContent = $this->content->dataForLocale($this->targetLocale);

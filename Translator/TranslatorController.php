@@ -21,31 +21,15 @@ class TranslatorController extends Controller
 
     public function postTranslate(Request $request): array
     {
-        $id = $request->id;
-        $sourceLocale = $request->sourceLocale;
-        $targetLocale = $request->targetLocale;
-
-        if ($sourceLocale === $targetLocale) {
-            return [
-                'message' => 'Can not translate the default locale.',
-            ];
-        }
-
-        $this->translator->translate($id, $targetLocale);
+        $this->translator->translate($request->id, $request->targetLocale);
 
         return [
             'message' => 'Translation successful!',
         ];
     }
 
-    public function getTranslate(string $id, string $sourceLocale, string $targetLocale): array
+    public function getTranslate(string $id, string $targetLocale): array
     {
-        if ($sourceLocale === $targetLocale) {
-            return [
-                'message' => 'Can not translate the default locale.',
-            ];
-        }
-
         $this->translator->translate($id, $targetLocale);
 
         return [

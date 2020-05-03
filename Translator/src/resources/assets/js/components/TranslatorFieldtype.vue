@@ -122,7 +122,6 @@ export default {
 
             axios.post('/!/translator/translate', {
                 id: this.id,
-                sourceLocale: this.defaultLocale,
                 targetLocale: this.currentLocale,
             })
             .then(response => {
