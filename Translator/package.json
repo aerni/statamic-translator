@@ -12,7 +12,6 @@
   "devDependencies": {
     "cross-env": "^7.0.2",
     "laravel-mix": "^2.1.11",
-    "laravel-mix-purgecss": "4.1.0",
     "vue-html-loader": "^1.2.4",
     "vue-loader": "^8.7.1",
     "vue-style-loader": "^4.1.2",
