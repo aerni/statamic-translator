@@ -16,6 +16,14 @@ class GoogleAdvancedTranslationService implements TranslationService
         $this->parent = $this->client->locationName($project, 'global');
     }
 
+    /**
+     * Translate the given content into the target language.
+     *
+     * @param string $content
+     * @param string $targetLanguage
+     * @param string $format
+     * @return string
+     */
     public function translateText(string $content, string $targetLanguage, string $format = 'html'): string
     {
         $mimeType = $this->getMimeType($format);
@@ -41,6 +49,12 @@ class GoogleAdvancedTranslationService implements TranslationService
 
     }
 
+    /**
+     * Detect the language of the given content.
+     *
+     * @param string $content
+     * @return string
+     */
     public function detectLanguage(string $content): string
     {
         try {
@@ -57,6 +71,11 @@ class GoogleAdvancedTranslationService implements TranslationService
 
     }
 
+    /**
+     * Get a list of supported languages.
+     *
+     * @return array
+     */
     public function supportedLanguages(): array
     {
         try {
@@ -76,6 +95,12 @@ class GoogleAdvancedTranslationService implements TranslationService
         }
     }
 
+    /**
+     * Return the MIME type based on the $format
+     *
+     * @param string $format
+     * @return string
+     */
     private function getMimeType(string $format): string
     {
         if ($format === 'text') {

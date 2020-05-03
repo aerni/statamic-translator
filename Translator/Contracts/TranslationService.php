@@ -23,7 +23,7 @@ interface TranslationService
     public function detectLanguage(string $content): string;
     
     /**
-     * Get a list of the supported languages.
+     * Get a list of supported languages.
      *
      * @return array
      */

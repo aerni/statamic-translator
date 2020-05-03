@@ -14,6 +14,14 @@ class GoogleBasicTranslationService implements TranslationService
         $this->client = $client;
     }
 
+    /**
+     * Translate the given content into the target language.
+     *
+     * @param string $content
+     * @param string $targetLanguage
+     * @param string $format
+     * @return string
+     */
     public function translateText(string $content, string $targetLanguage, string $format = 'html'): string
     {
         $format = $this->getFormat($format);
@@ -29,16 +37,33 @@ class GoogleBasicTranslationService implements TranslationService
         return $response['text'];
     }
 
+    /**
+     * Detect the language of the given content.
+     *
+     * @param string $content
+     * @return string
+     */
     public function detectLanguage(string $content): string
     {
         return $this->client->detectLanguage($content)['languageCode'];
     }
 
+    /**
+     * Get a list of supported languages.
+     *
+     * @return array
+     */
     public function supportedLanguages(): array
     {
         return $this->client->languages();
     }
 
+    /**
+     * Return the format based on the $format
+     *
+     * @param string $format
+     * @return string
+     */
     private function getFormat(string $format): string
     {
         if ($format === 'text') {
