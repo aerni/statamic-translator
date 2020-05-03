@@ -1,5 +1,5 @@
 {
-  "name": "michael-aerni/translator",
+  "name": "aerni/translator",
   "require": {
     "google/cloud-translate": "^1.7"
   }

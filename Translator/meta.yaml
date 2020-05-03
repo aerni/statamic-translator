@@ -1,5 +1,7 @@
 name: Translator
-version: '1.0'
+version: 1.0.0
+description: Translate your content with the click of a button
+addon_url: https://github.com/aerni/statamic-translator
 developer: 'Michael Aerni'
 developer_url: 'https://www.michaelaerni.ch'
 commercial: true
