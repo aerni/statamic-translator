@@ -12,7 +12,7 @@ interface TranslationService
      * @param string $format
      * @return string
      */
-    public function translateText(string $content, string $targetLanguage, string $format): string;
+    public function translateText(string $content, string $targetLanguage, string $format = null): string;
 
     /**
      * Detect the language of the given content.
