@@ -26,7 +26,7 @@ class TranslatorController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => translate('addons.Translator::fieldtype.success')
-            ]);
+            ], 200);
 
         } catch (Exception $e) {
 
@@ -47,7 +47,7 @@ class TranslatorController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => translate('addons.Translator::fieldtype.success')
-            ]);
+            ], 200);
 
         } catch (Exception $e) {
 
