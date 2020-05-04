@@ -20,7 +20,7 @@ class TranslatorController extends Controller
     public function postTranslate(Request $request)
     {
         try {
-            $this->translator->translate($request->id, $request->targetLocale);
+            $this->translator->handleTranslation($request->id, $request->targetLocale);
 
             return response()->json([
                 'status' => 200,
@@ -37,7 +37,7 @@ class TranslatorController extends Controller
     public function getTranslate(string $id, string $targetLocale)
     {
         try {
-            $this->translator->translate($id, $targetLocale);
+            $this->translator->handleTranslation($id, $targetLocale);
 
             return response()->json([
                 'status' => 200,
