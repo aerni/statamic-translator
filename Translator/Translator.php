@@ -49,7 +49,7 @@ class Translator
 
         $this->getData();
         $this->processData();
-        
+
         $this->translateData();
         $this->translateSlug();
         $this->saveTranslation();
@@ -147,7 +147,7 @@ class Translator
         $localizableFields = $fields->where('localizable', true);
 
         // Add the title field, so it can be translated.
-        if ($this->contentType !== 'globals' && !$localizableFields->has('title')) {
+        if ($this->contentType !== 'globals' && ! $localizableFields->has('title')) {
             $localizableFields->put('title', [
                 'type' => 'text',
                 'localizable' => true,
@@ -364,7 +364,7 @@ class Translator
      *
      * @param mixed $value
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     private function isTranslatableKeyValuePair($value, string $key): bool
     {
@@ -411,20 +411,19 @@ class Translator
         if ($this->slugShouldBeTranslated()) {
             // Deslugged slug from the unlocalized default content.
             $desluggedSlug = Str::deslugify($this->content->slug());
-    
+
             // Translate the deslugged slug.
             $translation = $this->service->translateText($desluggedSlug, $this->targetLocale, 'text');
-    
+
             // Save the translated slug to the translated content.
             $this->translatedData['slug'] = Str::slug($translation);
         }
-
     }
 
     /**
      * Determine if the slug should be translated.
      *
-     * @return boolean
+     * @return bool
      */
     private function slugShouldBeTranslated(): bool
     {
