@@ -9,27 +9,27 @@ use Statamic\API\Str;
 
 class Translator
 {
-    protected $service;
+    private $service;
 
-    protected $supportedFieldtypes = [
+    private $supportedFieldtypes = [
         'array', 'bard', 'grid', 'list', 'markdown', 'redactor', 'replicator',
         'table', 'tags', 'text', 'textarea',
     ];
 
-    protected $targetLocale;
+    private $targetLocale;
 
-    protected $content;
-    protected $contentType;
-    protected $defaultContent;
-    protected $localizedContent;
+    private $content;
+    private $contentType;
+    private $defaultContent;
+    private $localizedContent;
 
-    protected $localizableFields;
-    protected $supportedFields;
+    private $localizableFields;
+    private $supportedFields;
 
-    protected $fieldKeys;
+    private $fieldKeys;
 
-    protected $contentToTranslate;
-    protected $translatedContent;
+    private $contentToTranslate;
+    private $translatedContent;
 
     public function __construct(TranslationService $service)
     {
