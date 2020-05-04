@@ -5,3 +5,7 @@ mix.setPublicPath('Translator/resources/assets/')
         require('tailwindcss'),
     ])
     .js('resources/assets/js/fieldtype.js', 'js');
+
+if (mix.inProduction()) {
+    mix.version();
+}
