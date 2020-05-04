@@ -13,49 +13,41 @@ class TranslatorController extends Controller
     public function __construct(Translator $translator)
     {
         parent::__construct();
- 
+
         $this->translator = $translator;
     }
 
     public function postTranslate(Request $request)
     {
         try {
-
             $this->translator->translate($request->id, $request->targetLocale);
 
             return response()->json([
                 'status' => 200,
-                'message' => translate('addons.Translator::fieldtype.success')
+                'message' => translate('addons.Translator::fieldtype.success'),
             ], 200);
-
         } catch (Exception $e) {
-
             return response()->json([
                 'status' => $e->getCode(),
                 'message' => $e->getMessage(),
             ], $e->getCode());
-
         }
     }
 
     public function getTranslate(string $id, string $targetLocale)
     {
         try {
-
             $this->translator->translate($id, $targetLocale);
 
             return response()->json([
                 'status' => 200,
-                'message' => translate('addons.Translator::fieldtype.success')
+                'message' => translate('addons.Translator::fieldtype.success'),
             ], 200);
-
         } catch (Exception $e) {
-
             return response()->json([
                 'status' => $e->getCode(),
                 'message' => $e->getMessage(),
             ], $e->getCode());
-
         }
     }
 }

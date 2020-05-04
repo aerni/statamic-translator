@@ -27,13 +27,13 @@ class GoogleBasicTranslationService implements TranslationService
         $format = $this->getFormat($format);
 
         $response = $this->client->translate(
-            $content, 
+            $content,
             [
-                'target' => $targetLanguage, 
-                'format' => $format
+                'target' => $targetLanguage,
+                'format' => $format,
             ]
         );
-        
+
         return $response['text'];
     }
 
@@ -59,7 +59,7 @@ class GoogleBasicTranslationService implements TranslationService
     }
 
     /**
-     * Return the format based on the $format
+     * Return the format based on the $format.
      *
      * @param string $format
      * @return string
