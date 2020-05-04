@@ -2,6 +2,7 @@
 
 namespace Statamic\Addons\Translator;
 
+use Exception;
 use Illuminate\Http\Request;
 use Statamic\Extend\Controller;
 
@@ -16,21 +17,45 @@ class TranslatorController extends Controller
         $this->translator = $translator;
     }
 
-    public function postTranslate(Request $request): array
+    public function postTranslate(Request $request)
     {
-        $this->translator->translate($request->id, $request->targetLocale);
+        try {
 
-        return [
-            'message' => 'Translation successful!',
-        ];
+            $this->translator->translate($request->id, $request->targetLocale);
+
+            return response()->json([
+                'status' => 200,
+                'message' => translate('addons.Translator::fieldtype.success')
+            ]);
+
+        } catch (Exception $e) {
+
+            return response()->json([
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+
+        }
     }
 
-    public function getTranslate(string $id, string $targetLocale): array
+    public function getTranslate(string $id, string $targetLocale)
     {
-        $this->translator->translate($id, $targetLocale);
+        try {
 
-        return [
-            'message' => 'Translation successful!',
-        ];
+            $this->translator->translate($id, $targetLocale);
+
+            return response()->json([
+                'status' => 200,
+                'message' => translate('addons.Translator::fieldtype.success')
+            ]);
+
+        } catch (Exception $e) {
+
+            return response()->json([
+                'status' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ], $e->getCode());
+
+        }
     }
 }

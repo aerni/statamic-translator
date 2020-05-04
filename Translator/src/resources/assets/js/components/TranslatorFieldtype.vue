@@ -138,8 +138,8 @@ export default {
                 this.idle = false;
                 this.translating = false;
                 this.translated = false;
-                this.error = error;
-                console.log(this.error);
+                this.error = error.response.data;
+                console.log(error.response);
             });
         },
 
