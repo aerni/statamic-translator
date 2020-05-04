@@ -11,11 +11,11 @@ class TranslatorModifier extends Modifier
 
     public function __construct(TranslationService $service)
     {
-        $this->service = $service;    
+        $this->service = $service;
     }
 
     /**
-     * Modify a value
+     * Modify a value.
      *
      * @param mixed  $value    The value to be modified
      * @param array  $params   Any parameters used in the modifier
@@ -24,7 +24,7 @@ class TranslatorModifier extends Modifier
      */
     public function index($value, $params, $context)
     {
-        if (!array_get($params, 0)) {
+        if (! array_get($params, 0)) {
             return $value;
         }
 

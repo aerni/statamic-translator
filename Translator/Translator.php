@@ -3,10 +3,9 @@
 namespace Statamic\Addons\Translator;
 
 use Illuminate\Support\Collection;
+use Statamic\Addons\Translator\Contracts\TranslationService;
 use Statamic\API\Content;
 use Statamic\API\Str;
-use Statamic\Addons\Translator\Contracts\TranslationService;
-use Statamic\Addons\Translator\Utils;
 
 class Translator
 {
@@ -36,13 +35,13 @@ class Translator
     {
         $this->service = $service;
     }
-    
+
     /**
      * Translate the content associated with the requested ID.
      *
      * @param string $id
      * @param string $targetLocale
-     * @return boolean
+     * @return bool
      */
     public function translate(string $id, string $targetLocale): bool
     {
@@ -53,7 +52,7 @@ class Translator
 
         // Get the target locale to translate into.
         $this->targetLocale = $targetLocale;
-        
+
         // Get the unlocalized default content.
         $this->defaultContent = $this->content->defaultData();
         // Get the content that has already been localized into the target locale.
@@ -67,7 +66,7 @@ class Translator
 
         // Get the translated content.
         $this->translatedContent = $this->translateContent();
-        
+
         // Translate the slug.
         $this->translateSlug();
 
@@ -86,7 +85,7 @@ class Translator
     {
         // Get all the fields that are localizable.
         $this->localizableFields = $this->getLocalizableFields();
-        
+
         // Get all the supported fields that can be translated.
         $this->supportedFields = $this->getSupportedFields();
 
@@ -117,14 +116,14 @@ class Translator
 
         /**
          * The title is always present and localizable in the CP.
-         * This adds the title field, so we can translate it later. 
+         * This adds the title field, so we can translate it later.
          */
-        if (!$localizableFields->has('title') && $this->contentType !== 'globals') {
+        if (! $localizableFields->has('title') && $this->contentType !== 'globals') {
             $localizableFields->put('title', [
                 'type' => 'text',
-                'localizable' => true
+                'localizable' => true,
             ]);
-        };
+        }
 
         return $localizableFields->toArray();
     }
@@ -146,7 +145,7 @@ class Translator
      * @return array
      */
     private function getTranslatableContent(): array
-    {        
+    {
         // Return the content that can be translated. Only first level. No recursion into Bard/Replicator sets.
         return array_intersect_key($this->defaultContent, $this->supportedFields);
     }
@@ -163,12 +162,12 @@ class Translator
         if ($this->contentType === 'entry') {
             unset($array['slug']);
         }
-        
+
         // Remove slug from the content to translate.
         if ($this->contentType === 'page') {
             unset($array['slug']);
         }
-        
+
         // Remove ID from the content to translate.
         unset($array['id']);
 
@@ -204,6 +203,7 @@ class Translator
                         $item['sets'] = collect($item['sets'] ?? [])
                             ->map(function ($set) {
                                 $set['fields'] = $this->filterSupportedFieldtypes($set['fields'])->toArray();
+
                                 return $set;
                             })
                             ->filter(function ($set) {
@@ -221,7 +221,7 @@ class Translator
             ->filter(function ($item) {
                 $supported = in_array($item['type'], $this->supportedFieldtypes);
 
-                if (!$supported) {
+                if (! $supported) {
                     return false;
                 }
 
@@ -248,31 +248,33 @@ class Translator
      */
     private function getTranslatableFieldKeys(array $fields): array
     {
-        return collect($fields)->map(function ($item, $key) { 
-
+        return collect($fields)->map(function ($item, $key) {
             switch ($item['type']) {
 
                 case 'bard':
                     return collect($item['sets'])
                         ->map(function ($set) {
                             $set['fields'] = $this->getTranslatableFieldKeys($set['fields']);
+
                             return $set['fields'];
-                        })->put('text', []);;
+                        })->put('text', []);
                     break;
 
                 case 'replicator':
                     return collect($item['sets'])
                         ->map(function ($set) {
                             $set['fields'] = $this->getTranslatableFieldKeys($set['fields']);
+
                             return $set['fields'];
                         });
                     break;
 
                 case 'grid':
                     $item['fields'] = $this->getTranslatableFieldKeys($item['fields']);
+
                     return $item['fields'];
                     break;
-                    
+
                 case 'array':
                     if (array_key_exists('keys', $item)) {
                         return $item['keys'];
@@ -282,7 +284,6 @@ class Translator
             }
 
             return $key;
-
         })->toArray();
     }
 
@@ -293,15 +294,15 @@ class Translator
      * @return array
      */
     private function getTranslatableSetKeys(array $fields): array
-    {   
-        $sets = collect($fields)->map(function ($item) { 
-
+    {
+        $sets = collect($fields)->map(function ($item) {
             switch ($item['type']) {
 
                 case 'bard':
                     return collect($item['sets'])
                         ->map(function ($set) {
                             $set['fields'] = $this->getTranslatableSetKeys($set['fields']);
+
                             return $set['fields'];
                         })
                         ->put('text', []);
@@ -311,12 +312,12 @@ class Translator
                     return collect($item['sets'])
                         ->map(function ($set) {
                             $set['fields'] = $this->getTranslatableSetKeys($set['fields']);
+
                             return $set['fields'];
                         });
                     break;
 
             }
-
         })->toArray();
 
         $arrays = array_values(Utils::array_filter_recursive($sets, function ($item) {
@@ -329,7 +330,7 @@ class Translator
     /**
      * Translate the content into the requested target locale.
      * Return true when the translation was successul.
-     * 
+     *
      * @return array
      */
     private function translateContent(): array
@@ -358,7 +359,7 @@ class Translator
         // Translate HTML
         if (Utils::isHtml($value)) {
             return $this->service->translateText($value, $this->targetLocale, 'html');
-        };
+        }
 
         // Translate text
         return $this->service->translateText($value, $this->targetLocale, 'text');
@@ -369,7 +370,7 @@ class Translator
      *
      * @param any $value
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     private function isTranslatableKeyValuePair($value, string $key): bool
     {
@@ -439,7 +440,7 @@ class Translator
      * Save the translation to file.
      * Return true when saving was successful.
      *
-     * @return boolean
+     * @return bool
      */
     private function saveTranslation(): bool
     {

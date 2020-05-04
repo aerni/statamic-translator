@@ -2,8 +2,8 @@
 
 namespace Statamic\Addons\Translator;
 
-use Statamic\Extend\Fieldtype;
 use Statamic\Addons\Translator\Contracts\TranslationService;
+use Statamic\Extend\Fieldtype;
 
 class TranslatorFieldtype extends Fieldtype
 {
@@ -15,19 +15,18 @@ class TranslatorFieldtype extends Fieldtype
     {
         $this->service = $service;
     }
-    
+
     /**
-     * The blank/default value
+     * The blank/default value.
      *
      * @return array
      */
     public function blank()
     {
-        return null;
     }
 
     /**
-     * Pre-process the data before it gets sent to the publish page
+     * Pre-process the data before it gets sent to the publish page.
      *
      * @param mixed $data
      * @return array|mixed
@@ -43,7 +42,7 @@ class TranslatorFieldtype extends Fieldtype
     }
 
     /**
-     * Process the data before it gets saved
+     * Process the data before it gets saved.
      *
      * @param mixed $data
      * @return array|mixed
@@ -51,7 +50,7 @@ class TranslatorFieldtype extends Fieldtype
     public function process($data)
     {
         unset($data['supportedLanguages']);
-        
+
         return $data;
     }
 }

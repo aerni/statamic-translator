@@ -29,24 +29,19 @@ class GoogleAdvancedTranslationService implements TranslationService
         $mimeType = $this->getMimeType($format);
 
         try {
-
             $response = $this->client->translateText(
-                [$content], 
-                $targetLanguage, 
-                $this->parent, 
+                [$content],
+                $targetLanguage,
+                $this->parent,
                 [
-                    'mimeType' => $mimeType
+                    'mimeType' => $mimeType,
                 ]
             );
 
             return $response->getTranslations()[0]->getTranslatedText();
-
         } finally {
-
             $this->client->close();
-
         }
-
     }
 
     /**
@@ -58,17 +53,12 @@ class GoogleAdvancedTranslationService implements TranslationService
     public function detectLanguage(string $content): string
     {
         try {
-            
             $response = $this->client->detectLanguage($this->parent, ['content' => $content]);
 
             return $response->getLanguages()[0]->getLanguageCode();
-
         } finally {
-
             $this->client->close();
-
         }
-
     }
 
     /**
@@ -79,7 +69,6 @@ class GoogleAdvancedTranslationService implements TranslationService
     public function supportedLanguages(): array
     {
         try {
-            
             $response = $this->client->getSupportedLanguages($this->parent);
 
             foreach ($response->getLanguages() as $language) {
@@ -87,16 +76,13 @@ class GoogleAdvancedTranslationService implements TranslationService
             }
 
             return $supportedLanguages;
-
         } finally {
-
             $this->client->close();
-
         }
     }
 
     /**
-     * Return the MIME type based on the $format
+     * Return the MIME type based on the $format.
      *
      * @param string $format
      * @return string
