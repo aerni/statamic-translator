@@ -1,4 +1,4 @@
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/aerni/tailwindcss-rfs?style=flat-square)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/aerni/statamic-translator?style=flat-square)
 ![Statamic](https://img.shields.io/badge/statamic-2.10-blue.svg?style=flat-square)
 
 # Statamic Translator
