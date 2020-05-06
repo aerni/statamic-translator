@@ -29,7 +29,7 @@ class Utils
      *
      * @param mixed $key
      * @param array $array
-     * @return boolean
+     * @return bool
      */
     public static function array_key_exists_recursive($key, array $array): bool
     {
@@ -45,7 +45,7 @@ class Utils
 
         return false;
     }
-    
+
     /**
      * Recursively map an array to a callback function.
      *
@@ -72,7 +72,7 @@ class Utils
      * Check if the provided string is HTML or not.
      *
      * @param string $string
-     * @return boolean
+     * @return bool
      */
     public static function isHtml(string $string): bool
     {
