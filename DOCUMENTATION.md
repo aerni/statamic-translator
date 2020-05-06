@@ -52,12 +52,12 @@ GOOGLE_APPLICATION_CREDENTIALS=********************************
 4. Select the locale you want to translate into.
 5. Hit the Translator `Translate Content` button and wait for the translation to finish.
 
-> Important: Give a unique name to each field variable in your fieldset. This will make sure that Translator only translates supported fields.
+> **Important:** Give a unique name to each field variable in your fieldset. This will make sure that Translator only translates supported fields.
 
 ### Supported Fieldtypes
 The following fieldtypes are supported for translation: `array`, `bard`, `grid`, `list`, `markdown`, `redactor`, `replicator`, `table`, `tags`, `text`, `textarea`.
 
-> Note: The `array` fieldtype can only be translated when the keys are predefined.
+> **Note:** The `array` fieldtype can only be translated when the keys are predefined.
 
 ### Supported Content Types
 Translator works with the following content types: `Pages`, `Collections`, `Taxonomies`, `Globals`
