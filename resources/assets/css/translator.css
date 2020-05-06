@@ -2,4 +2,15 @@
 
 @tailwind components;
 
+.icon-circular-graph {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: #76a9fa;
+}
+.icon-circular-graph::before {
+    top: 0;
+}
+
 @tailwind utilities;

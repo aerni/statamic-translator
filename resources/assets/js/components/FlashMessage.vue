@@ -61,15 +61,4 @@ export default {
 }
 </script>
 
-<style scoped>
-.icon-circular-graph {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    color: #76a9fa;
-}
-.icon-circular-graph::before {
-    top: 0;
-}
-</style>
+<style scoped src="../../../../Translator/resources/assets/css/translator.css"></style>
