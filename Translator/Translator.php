@@ -384,12 +384,12 @@ class Translator
         }
 
         // Skip 'type: $value', where $value is a Bard/Replicator set key.
-        if ($key === 'type' && Utils::multi_array_key_exists($value, $this->fieldKeys['setKeys'])) {
+        if ($key === 'type' && Utils::array_key_exists_recursive($value, $this->fieldKeys['setKeys'])) {
             return false;
         }
 
         // Skip if $key doesn't exists in the fieldset.
-        if (! Utils::multi_array_key_exists($key, $this->fieldKeys['allKeys']) && ! is_numeric($key)) {
+        if (! Utils::array_key_exists_recursive($key, $this->fieldKeys['allKeys']) && ! is_numeric($key)) {
             return false;
         }
 

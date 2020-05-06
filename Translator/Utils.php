@@ -15,6 +15,21 @@ class Utils
 
         return $array;
     }
+
+    public static function array_key_exists_recursive($key, array $array): bool
+    {
+        if (array_key_exists($key, $array)) {
+            return true;
+        } else {
+            foreach ($array as $nested) {
+                if (is_array($nested) && self::array_key_exists_recursive($key, $nested)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     
     public static function array_map_recursive($callback, $input)
     {
@@ -28,22 +43,6 @@ class Utils
         }
 
         return $output;
-    }
-
-
-    public static function multi_array_key_exists($key, array $array): bool
-    {
-        if (array_key_exists($key, $array)) {
-            return true;
-        } else {
-            foreach ($array as $nested) {
-                if (is_array($nested) && self::multi_array_key_exists($key, $nested)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     public static function isHtml($string)
