@@ -33,21 +33,4 @@ class TranslatorController extends Controller
             ], $e->getCode());
         }
     }
-
-    public function getTranslate(string $id, string $targetLocale)
-    {
-        try {
-            $this->translator->handleTranslation($id, $targetLocale);
-
-            return response()->json([
-                'status' => 200,
-                'message' => translate('addons.Translator::fieldtype.success'),
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => $e->getCode(),
-                'message' => $e->getMessage(),
-            ], $e->getCode());
-        }
-    }
 }
