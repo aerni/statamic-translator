@@ -1,16 +1,11 @@
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/aerni/tailwindcss-rfs?style=flat-square)
+![Statamic](https://img.shields.io/badge/statamic-2.10-blue.svg?style=flat-square)
+
 # Statamic Translator
+Translator provides a simple and intuitive way to translate your content. Translate your content with the click of a button. It's as simple as it gets!
 
-## Translatable Fieldtypes
-| Supported | Unsupported | Partially Supported |
-|-----------|---------------------|-------------|
-| `bard`, `grid`, `list`, `markdown`, `redactor`, `replicator`, `table`, `tags`, `text`, `textarea` | `assets`, `checkboxes`, `collection`, `collections`, `date`, `fieldset`, `form`, `hidden`, `integer`, `pages`, `radio`, `revealer`, `select`, `suggest`, `taxonomy`, `template`, `theme`, `time`, `toggle`, `users`, `video`, `yaml` | `array` |
-
-LIMITATION: array with variable values can't be translated, because the key can't be found in the fieldset to compare to.
-Maybe support: array, select
-
-## Modifier
-The modifier can come in handy to translate fixed values from within your template. Like labels of checkboxes, radio or select fieldtypes.
+## Documentation
+[Read the documentation](https://statamic.com/marketplace/addons/translator/docs) to learn how to use this addon.
 
 ## Licensing
-
-Statamic Translator is commercial software but has an open-source codebase. If you want to use Statamic Translator in production, you'll need to buy a license from the Statamic Marketplace.
+Statamic Translator is commercial software but has an open-source codebase. If you want to use Statamic Translator in production, you'll need to [buy a license](https://statamic.com/marketplace/addons/translator) from the Statamic Marketplace.
