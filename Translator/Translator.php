@@ -329,10 +329,10 @@ class Translator
     private function translateData(): void
     {
         $this->translatedData = Utils::array_map_recursive(
+            $this->dataToTranslate,
             function ($value, $key) {
                 return $this->translate($value, $key);
-            },
-            $this->dataToTranslate
+            }
         );
     }
 
