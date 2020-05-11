@@ -1,4 +1,0 @@
-translation_service: 'google_basic'
-google_translation_api_key: '{env:GOOGLE_TRANSLATION_API_KEY}'
-google_application_credentials: '{env:GOOGLE_APPLICATION_CREDENTIALS}'
-google_cloud_project: '{env:GOOGLE_CLOUD_PROJECT}'

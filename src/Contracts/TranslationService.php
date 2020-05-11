@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Addons\Translator\Contracts;
+namespace Aerni\Translator\Contracts;
 
 interface TranslationService
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\Addons\Translator;
+namespace Aerni\Translator;
 
-use Statamic\Addons\Translator\Contracts\TranslationService;
-use Statamic\Extend\Modifier;
+use Aerni\Translator\Contracts\TranslationService;
+use Statamic\Modifiers\Modifier;
 
 class TranslatorModifier extends Modifier
 {

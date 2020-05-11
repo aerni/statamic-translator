@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Translator;
+namespace Aerni\Translator;
 
 use Exception;
 use Illuminate\Http\Request;
-use Statamic\Extend\Controller;
+use Statamic\Http\Controllers\Controller;
 
 class TranslatorController extends Controller
 {
@@ -12,8 +12,6 @@ class TranslatorController extends Controller
 
     public function __construct(Translator $translator)
     {
-        parent::__construct();
-
         $this->translator = $translator;
     }
 
@@ -24,7 +22,7 @@ class TranslatorController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => translate('addons.Translator::fieldtype.success'),
+                'message' => __('translator.fieldtype.success'),
             ], 200);
         } catch (Exception $e) {
             return response()->json([

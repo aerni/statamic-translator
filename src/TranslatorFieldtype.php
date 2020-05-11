@@ -1,19 +1,27 @@
 <?php
 
-namespace Statamic\Addons\Translator;
+namespace Aerni\Translator;
 
-use Statamic\Addons\Translator\Contracts\TranslationService;
-use Statamic\Extend\Fieldtype;
+use Aerni\Translator\Contracts\TranslationService;
+use Statamic\Fields\Fieldtype;
 
 class TranslatorFieldtype extends Fieldtype
 {
     private $service;
 
-    public $category = ['special'];
+    protected $icon = 'translate';
+    protected $categories = ['special'];
 
     public function __construct(TranslationService $service)
     {
         $this->service = $service;
+    }
+
+    public function preload()
+    {
+        return [
+            'supportedLanguages' => $this->service->supportedLanguages(),
+        ];
     }
 
     /**
@@ -21,8 +29,9 @@ class TranslatorFieldtype extends Fieldtype
      *
      * @return array
      */
-    public function blank()
+    public function defaultValue()
     {
+        return null;
     }
 
     /**
@@ -33,11 +42,6 @@ class TranslatorFieldtype extends Fieldtype
      */
     public function preProcess($data)
     {
-        $data = [
-            'buttonText' => $this->getFieldConfig('button_text'),
-            'supportedLanguages' => $this->service->supportedLanguages(),
-        ];
-
         return $data;
     }
 
@@ -49,8 +53,6 @@ class TranslatorFieldtype extends Fieldtype
      */
     public function process($data)
     {
-        unset($data['supportedLanguages']);
-
         return $data;
     }
 }

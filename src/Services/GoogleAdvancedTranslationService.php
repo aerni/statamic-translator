@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\Addons\Translator\Services;
+namespace Aerni\Translator\Services;
 
+use Aerni\Translator\Contracts\TranslationService;
 use Google\Cloud\Translate\V3\TranslationServiceClient;
-use Statamic\Addons\Translator\Contracts\TranslationService;
 
 class GoogleAdvancedTranslationService implements TranslationService
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Addons\Translator;
+namespace Aerni\Translator;
 
 class Utils
 {

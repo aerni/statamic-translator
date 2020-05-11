@@ -1,8 +1,8 @@
 <?php
 
-namespace Statamic\Addons\Translator;
+namespace Aerni\Translator;
 
-use Statamic\Addons\Translator\Contracts\TranslationService;
+use Aerni\Translator\Contracts\TranslationService;
 use Statamic\API\Content;
 use Statamic\API\Str;
 

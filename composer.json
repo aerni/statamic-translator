@@ -1,0 +1,23 @@
+{
+  "name": "aerni/statamic-translator",
+  "type": "statamic-addon",
+  "autoload": {
+      "psr-4": {
+          "Aerni\\Translator\\": "src"
+      }
+  },
+  "extra": {
+      "statamic": {
+          "name": "Translator",
+          "description": "Translate your content with the click of a button"
+      },
+      "laravel": {
+          "providers": [
+              "Aerni\\Translator\\ServiceProvider"
+          ]
+      }
+  },
+  "require": {
+      "google/cloud-translate": "^1.7"
+  }
+}
