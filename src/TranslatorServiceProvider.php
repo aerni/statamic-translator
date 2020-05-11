@@ -20,7 +20,7 @@ class TranslatorServiceProvider extends AddonServiceProvider
     ];
 
     protected $scripts = [
-        __DIR__.'/../public/js/fieldtype.js'
+        __DIR__.'/../public/js/translator.js'
     ];
 
     /**

@@ -1,10 +1,10 @@
 const mix = require('laravel-mix');
 
-mix.setPublicPath('Translator/resources/assets/')
-    .postCss('resources/assets/css/translator.css', 'css', [
+mix.setPublicPath('public/')
+    .postCss('resources/css/translator.css', 'css', [
         require('tailwindcss'),
     ])
-    .js('resources/assets/js/fieldtype.js', 'js');
+    .js('resources/js/translator.js', 'js');
 
 if (mix.inProduction()) {
     mix.version();
