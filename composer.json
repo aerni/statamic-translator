@@ -1,5 +1,5 @@
 {
-  "name": "aerni/statamic-translator",
+  "name": "aerni/translator",
   "type": "statamic-addon",
   "autoload": {
       "psr-4": {
