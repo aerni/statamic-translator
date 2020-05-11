@@ -13,7 +13,7 @@
       },
       "laravel": {
           "providers": [
-              "Aerni\\Translator\\ServiceProvider"
+              "Aerni\\Translator\\TranslatorServiceProvider"
           ]
       }
   },
