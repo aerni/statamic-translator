@@ -12,73 +12,56 @@ use Statamic\Providers\AddonServiceProvider;
 class TranslatorServiceProvider extends AddonServiceProvider
 {
     protected $modifiers = [
-        \Aerni\Translator\TranslatorModifier::class,
+        TranslatorModifier::class,
     ];
 
     protected $fieldtypes = [
-        \Aerni\Translator\TranslatorFieldtype::class,
+        TranslatorFieldtype::class,
     ];
 
     protected $scripts = [
-        __DIR__.'/../public/js/translator.js'
+        __DIR__.'/../resources/dist/js/translator.js'
     ];
 
-    /**
-     * Bootstrap the application services.
-     *
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
         parent::boot();
-
-        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'translator');
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/translator.php' => config_path('translator.php'),
-            ], 'config');
-
-            $this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/translator'),
-            ], 'lang');
-        }
 
         $translationService = config('translator.translation_service');
 
         if ($translationService === 'google_basic') {
-            $this->app->singleton(TranslationService::class, GoogleBasicTranslationService::class);
-
-            $this->app->singleton(TranslateClient::class, function ($app) {
-                return new TranslateClient([
-                    'key' => config('translator.google_translation_api_key'),
-                ]);
-            });
+            $this->bindGoogleBasic();
         }
 
         if ($translationService === 'google_advanced') {
-            $this->app->singleton(TranslationService::class, function ($app) {
-                return new GoogleAdvancedTranslationService(
-                    $this->app->make(TranslationServiceClient::class),
-                    config('translator.google_cloud_project')
-                );
-            });
-
-            $this->app->singleton(TranslationServiceClient::class, function ($app) {
-                return new TranslationServiceClient([
-                    'credentials' => config('translator.google_application_credentials'),
-                ]);
-            });
+            $this->bindGoogleAdvanced();
         }
     }
 
-    /**
-     * Register the application services.
-     *
-     * @return void
-     */
-    public function register()
+    protected function bindGoogleBasic(): void
     {
-        //
+        $this->app->singleton(TranslationService::class, GoogleBasicTranslationService::class);
+
+        $this->app->singleton(TranslateClient::class, function () {
+            return new TranslateClient([
+                'key' => config('translator.google_translation_api_key'),
+            ]);
+        });
+    }
+
+    protected function bindGoogleAdvanced(): void
+    {
+        $this->app->singleton(TranslationService::class, function () {
+            return new GoogleAdvancedTranslationService(
+                $this->app->make(TranslationServiceClient::class),
+                config('translator.google_cloud_project')
+            );
+        });
+
+        $this->app->singleton(TranslationServiceClient::class, function () {
+            return new TranslationServiceClient([
+                'credentials' => config('translator.google_application_credentials'),
+            ]);
+        });
     }
 }
