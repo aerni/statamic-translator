@@ -15,14 +15,13 @@ class TranslatorModifier extends Modifier
     }
 
     /**
-     * Modify a value.
+     * Translate a value to a target locale
      *
-     * @param mixed  $value    The value to be modified
-     * @param array  $params   Any parameters used in the modifier
-     * @param array  $context  Contextual values
-     * @return mixed
+     * @param mixed $value
+     * @param array $params
+     * @return string
      */
-    public function index($value, $params, $context)
+    public function index($value, $params): string
     {
         if (! array_get($params, 0)) {
             return $value;
