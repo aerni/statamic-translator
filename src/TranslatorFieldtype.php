@@ -17,7 +17,12 @@ class TranslatorFieldtype extends Fieldtype
         $this->service = $service;
     }
 
-    public function preload()
+    /**
+     * Preload some data to be available in the vue component.
+     *
+     * @return array
+     */
+    public function preload(): array
     {
         return [
             'supportedLanguages' => $this->service->supportedLanguages(),
@@ -27,7 +32,7 @@ class TranslatorFieldtype extends Fieldtype
     /**
      * The blank/default value.
      *
-     * @return array
+     * @return null
      */
     public function defaultValue()
     {
