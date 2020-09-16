@@ -2,18 +2,11 @@
 
 namespace Aerni\Translator;
 
-use Aerni\Translator\Contracts\TranslationService;
+use Aerni\Translator\Facades\TranslationService;
 use Statamic\Modifiers\Modifier;
 
 class TranslatorModifier extends Modifier
 {
-    private $service;
-
-    public function __construct(TranslationService $service)
-    {
-        $this->service = $service;
-    }
-
     /**
      * Translate a value to a target locale
      *
@@ -29,6 +22,6 @@ class TranslatorModifier extends Modifier
 
         $targetLocale = array_get($params, 0);
 
-        return $this->service->translateText($value, $targetLocale);
+        return TranslationService::translateText($value, $targetLocale);
     }
 }

@@ -2,20 +2,13 @@
 
 namespace Aerni\Translator;
 
-use Aerni\Translator\Contracts\TranslationService;
+use Aerni\Translator\Facades\TranslationService;
 use Statamic\Fields\Fieldtype;
 
 class TranslatorFieldtype extends Fieldtype
 {
-    private $service;
-
     protected $icon = 'translate';
     protected $categories = ['special'];
-
-    public function __construct(TranslationService $service)
-    {
-        $this->service = $service;
-    }
 
     /**
      * Preload some data to be available in the vue component.
@@ -25,7 +18,7 @@ class TranslatorFieldtype extends Fieldtype
     public function preload(): array
     {
         return [
-            'supportedLanguages' => $this->service->supportedLanguages(),
+            'supportedLanguages' => TranslationService::supportedLanguages(),
         ];
     }
 

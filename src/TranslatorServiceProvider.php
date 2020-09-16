@@ -36,6 +36,8 @@ class TranslatorServiceProvider extends AddonServiceProvider
         if ($translationService === 'google_advanced') {
             $this->bindGoogleAdvanced();
         }
+
+        $this->app->bind('TranslationService', TranslationService::class);
     }
 
     protected function bindGoogleBasic(): void
