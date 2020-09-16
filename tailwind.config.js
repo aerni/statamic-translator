@@ -1,8 +1,4 @@
 module.exports = {
-    purge: [
-        './resources/**/*.vue',
-    ],
-    plugins: [
-        require('@tailwindcss/ui'),
-    ]
-  }
+    purge: ['./resources/**/*.vue'],
+    plugins: [require('@tailwindcss/ui')],
+};
