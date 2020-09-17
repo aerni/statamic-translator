@@ -2,7 +2,7 @@
 
 namespace Aerni\Translator;
 
-use Aerni\Translator\Facades\TranslationService;
+use Facades\Aerni\Translator\Contracts\TranslationService;
 use Statamic\Modifiers\Modifier;
 
 class TranslatorModifier extends Modifier
