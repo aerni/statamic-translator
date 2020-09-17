@@ -1,12 +1,12 @@
 <?php
 
-namespace Aerni\Translator;
+namespace Aerni\Translator\Fieldtypes;
 
 use Facades\Aerni\Translator\Contracts\TranslationService;
 use Statamic\Facades\Site;
 use Statamic\Fields\Fieldtype;
 
-class TranslatorFieldtype extends Fieldtype
+class Translator extends Fieldtype
 {
     protected $icon = 'translate';
     protected $categories = ['special'];

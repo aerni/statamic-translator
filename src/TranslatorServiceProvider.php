@@ -17,7 +17,7 @@ class TranslatorServiceProvider extends AddonServiceProvider
     ];
 
     protected $fieldtypes = [
-        TranslatorFieldtype::class,
+        Fieldtypes\Translator::class,
     ];
 
     protected $routes = [
