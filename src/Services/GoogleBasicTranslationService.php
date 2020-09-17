@@ -2,8 +2,9 @@
 
 namespace Aerni\Translator\Services;
 
-use Aerni\Translator\Contracts\TranslationService;
+use Illuminate\Support\Facades\Cache;
 use Google\Cloud\Translate\V2\TranslateClient;
+use Aerni\Translator\Contracts\TranslationService;
 
 class GoogleBasicTranslationService implements TranslationService
 {
@@ -55,7 +56,9 @@ class GoogleBasicTranslationService implements TranslationService
      */
     public function supportedLanguages(): array
     {
-        return $this->client->languages();
+        return Cache::remember('supported_languages', 86400, function () {
+            return $this->client->languages();
+        });
     }
 
     /**

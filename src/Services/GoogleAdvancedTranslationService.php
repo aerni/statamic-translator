@@ -2,6 +2,7 @@
 
 namespace Aerni\Translator\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Aerni\Translator\Contracts\TranslationService;
 use Google\Cloud\Translate\V3\TranslationServiceClient;
 
@@ -69,13 +70,15 @@ class GoogleAdvancedTranslationService implements TranslationService
     public function supportedLanguages(): array
     {
         try {
-            $response = $this->client->getSupportedLanguages($this->parent);
+            return Cache::remember('supported_languages', 86400, function () {
+                $response = $this->client->getSupportedLanguages($this->parent);
 
-            foreach ($response->getLanguages() as $language) {
-                $supportedLanguages[] = $language->getLanguageCode();
-            }
+                foreach ($response->getLanguages() as $language) {
+                    $supportedLanguages[] = $language->getLanguageCode();
+                }
 
-            return $supportedLanguages;
+                return $supportedLanguages;
+            });
         } finally {
             $this->client->close();
         }
