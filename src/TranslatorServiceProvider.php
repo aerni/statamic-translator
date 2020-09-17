@@ -13,7 +13,7 @@ use Statamic\Providers\AddonServiceProvider;
 class TranslatorServiceProvider extends AddonServiceProvider
 {
     protected $modifiers = [
-        TranslatorModifier::class,
+        Modifiers\Translate::class,
     ];
 
     protected $fieldtypes = [
