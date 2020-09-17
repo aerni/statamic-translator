@@ -11,6 +11,11 @@ class TranslatorFieldtype extends Fieldtype
     protected $icon = 'translate';
     protected $categories = ['special'];
 
+    /**
+     * Add config fields to the fieldtype.
+     *
+     * @return array
+     */
     public function configFieldItems(): array
     {
         return [
@@ -38,42 +43,15 @@ class TranslatorFieldtype extends Fieldtype
         ];
     }
 
+    /**
+     * Get all the locales from the sites array.
+     *
+     * @return array
+     */
     protected function locales(): array
     {
         return Site::all()->mapWithKeys(function ($site, $key) {
             return [$key => $site->shortLocale()];
         })->all();
-    }
-
-    /**
-     * The blank/default value.
-     *
-     * @return null
-     */
-    public function defaultValue()
-    {
-        return null;
-    }
-
-    /**
-     * Pre-process the data before it gets sent to the publish page.
-     *
-     * @param mixed $data
-     * @return array|mixed
-     */
-    public function preProcess($data)
-    {
-        return $data;
-    }
-
-    /**
-     * Process the data before it gets saved.
-     *
-     * @param mixed $data
-     * @return array|mixed
-     */
-    public function process($data)
-    {
-        return $data;
     }
 }
