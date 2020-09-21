@@ -161,8 +161,8 @@ export default {
                 this.idle = false;
                 this.translating = false;
                 this.translated = false;
-                this.error = error.response.data;
-                console.log(error.response);
+                this.error = error.response.data.error;
+                console.log(error.response.data.error);
             });
         },
 
