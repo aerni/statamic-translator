@@ -1,13 +1,13 @@
 <?php
 
 return [
-  
+
     /*
     |--------------------------------------------------------------------------
     | Translation Service
     |--------------------------------------------------------------------------
     |
-    | Choose your prefered translation service. 
+    | Choose your prefered translation service.
     | Possible values: 'google_basic', 'google_advanced'
     |
     */
@@ -21,7 +21,6 @@ return [
     |
     | Your Google Translation API Key. This only works with 'google_basic'.
     |
-    |--------------------------------------------------------------------------
     */
 
     'google_translation_api_key' => env('GOOGLE_TRANSLATION_API_KEY'),
@@ -33,7 +32,6 @@ return [
     |
     | The path to your application credentials json.
     |
-    |--------------------------------------------------------------------------
     */
 
     'google_application_credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
@@ -45,7 +43,6 @@ return [
     |
     | Your Google Cloud Project.
     |
-    |--------------------------------------------------------------------------
     */
 
     'google_cloud_project' => env('GOOGLE_CLOUD_PROJECT'),
