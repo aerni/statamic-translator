@@ -1,29 +1,29 @@
 <?php
 
-namespace Aerni\Translator;
+namespace Aerni\Translator\Data;
 
-use Statamic\Support\Str;
+use Aerni\Translator\Utils;
+use Aerni\Translator\Contracts\TranslationService;
+use Aerni\Translator\Exceptions\TranslationFailed;
+use Aerni\Translator\Data\Concerns\TranslatorGuards;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Facades\GlobalSet;
-use Aerni\Translator\Contracts\TranslationService;
+use Statamic\Support\Str;
 
 class Translator
 {
-    protected $service;
+    use TranslatorGuards;
 
     protected $supportedFieldtypes = [
         'array', 'bard', 'grid', 'list', 'markdown', 'replicator',
-        'table', 'tags', 'text', 'textarea',
+        'slug', 'table', 'tags', 'text', 'textarea',
     ];
 
-    protected $id;
-    protected $targetSite;
-    protected $targetLocale;
-
+    protected $service;
     protected $entry;
-    protected $contentType;
+
+    protected $targetSite;
+    protected $targetLanguage;
     protected $rootData;
     protected $localizedData;
 
@@ -33,129 +33,131 @@ class Translator
     protected $dataToTranslate;
 
     protected $translatedData;
+    protected $translatedEntry;
 
-    public function __construct(TranslationService $service)
+    public function __construct(TranslationService $service, string $id, string $targetSite)
     {
         $this->service = $service;
-    }
-
-    /**
-     * Handle the translation.
-     *
-     * @param string $id
-     * @param string $targetSite
-     * @return void
-     */
-    public function handleTranslation(string $id, string $targetSite): void
-    {
-        $this->id = $id;
+        $this->entry = Data::find($id);
         $this->targetSite = $targetSite;
-
-        $this->getData();
-        $this->processData();
-
-        $this->translateData();
-        $this->translateSlug();
-        $this->saveTranslation();
     }
 
     /**
-     * Get the data by ID and target locale.
+     * Prepare the data for translation.
      *
-     * @return void
+     * @return self
      */
-    protected function getData(): void
+    public function process(): self
     {
-        $this->data = Data::find($this->id);
-        $this->contentType = $this->contentType($this->data);
-
-        if ($this->contentType === 'Entry') {
-            $this->targetLocale = $this->data->site()->shortLocale();
-            $this->rootData = $this->data->root()->data()->toArray();
-            $this->localizedData = $this->data->data()->toArray();
+        if (! $this->shouldProcessData()) {
+            throw TranslationFailed::canNotTranslateRoot();
         }
 
-        if ($this->contentType === 'GlobalSet') {
-            $this->targetLocale = $this->shortLocale(
-                $this->data->localizations()->get($this->targetSite)->locale()
-            );
-            $this->rootData = $this->data->inDefaultSite()->data()->toArray();
-            $this->localizedData = $this->data->in($this->targetSite)->data()->toArray();
+        $this->targetLanguage = $this->getTargetLanguage();
+        $this->rootData = $this->getRootData();
+        $this->localizedData = $this->getlocalizedData();
+
+        $this->translatableFields = $this->getTranslatableFields();
+        $this->translatableData = $this->getTranslatableData();
+        $this->fieldKeys = $this->getFieldKeys();
+        $this->dataToTranslate = $this->getDataToTranslate();
+
+        $this
+            ->translateEntry()
+            ->save();
+
+        return $this;
+    }
+
+    /**
+     * Returns the translated Entry/GlobalSet.
+     *
+     * @return mixed
+     */
+    protected function translateEntry()
+    {
+        $translatedData = $this->translateData($this->dataToTranslate);
+
+        if ($this->contentType($this->entry) === 'Entry') {
+            return $this->entry->slug($this->slug())
+                ->data($translatedData);
+        }
+
+        if ($this->contentType($this->entry) === 'GlobalSet') {
+            return $this->entry->in($this->targetSite)
+                ->data($translatedData);
         }
     }
 
     /**
-     * Get the type of content.
+     * Get the entry's root data.
      *
-     * @param mixed $data
-     * @return string
+     * @return array
      */
-    protected function contentType($data): string
+    protected function getRootData(): array
     {
-        if ($data instanceof \Statamic\Globals\GlobalSet) {
-            return 'GlobalSet';
+        if ($this->contentType($this->entry) === 'Entry') {
+            return $this->entry->root()->data()->toArray();
         }
 
-        if ($data instanceof \Statamic\Entries\Entry) {
-            return 'Entry';
+        if ($this->contentType($this->entry) === 'GlobalSet') {
+            return $this->entry->inDefaultSite()->data()->toArray();
+        }
+    }
+
+    /**
+    * Get the entry's localized data.
+    *
+    * @return array
+    */
+    protected function getLocalizedData(): array
+    {
+        if ($this->contentType($this->entry) === 'Entry') {
+            return $this->entry->data()->toArray();
         }
 
-        return 'undefined';
+        if ($this->contentType($this->entry) === 'GlobalSet') {
+            return $this->entry->in($this->targetSite)->data()->toArray();
+        }
     }
 
     /**
-     * Get the short locale from a site by handle.
+     * Get the translatable fields. A field is considered translatable
+     * when 'localizable' is set to 'true' in the blueprint and
+     * the type of field is supported by Translator.
      *
-     * @param string $siteHandle
-     * @return string
+     * @return array
      */
-    protected function shortLocale(string $siteHandle): string
+    protected function getTranslatableFields(): array
     {
-        return Site::get($siteHandle)->shortLocale();
+        $localizableFields = $this->entry
+            ->blueprint()
+            ->fields()
+            ->localizable()
+            ->all()
+            ->toArray();
+
+        return $this->filterSupportedFieldtypes($localizableFields);
     }
 
     /**
-     * Process and prepare the data for translation.
-     *
-     * @return void
-     */
-    protected function processData(): void
+    * Get the translatable data.
+    *
+    * @return array
+    */
+    protected function getTranslatableData(): array
     {
-        $this->getTranslatableFields();
-        $this->getTranslatableData();
-        $this->getFieldKeys();
-        $this->getDataToTranslate();
-    }
-
-    /**
-     * Get the translatable fields.
-     *
-     * @return void
-     */
-    protected function getTranslatableFields(): void
-    {
-        $localizableFields = $this->getLocalizableFields();
-        $this->translatableFields = $this->filterSupportedFieldtypes($localizableFields);
-    }
-
-    /**
-     * Get the translatable data.
-     *
-     * @return void
-     */
-    protected function getTranslatableData(): void
-    {
-        $this->translatableData = array_intersect_key($this->rootData, $this->translatableFields);
+        return array_intersect_key($this->rootData, $this->translatableFields);
     }
 
     /**
      * Get the keys of translatable fields.
      *
-     * @return void
+     * @return array
      */
-    protected function getFieldKeys(): void
+    protected function getFieldKeys(): array
     {
-        $this->fieldKeys = [
+        return [
             'allKeys' => $this->getTranslatableFieldKeys($this->translatableFields),
             'setKeys' => $this->getTranslatableSetKeys($this->translatableFields),
         ];
@@ -164,54 +166,44 @@ class Translator
     /**
      * Get the data to translate.
      *
-     * @return void
+     * @return array
      */
-    protected function getDataToTranslate(): void
+    protected function getDataToTranslate(): array
     {
         // Merge translatable with localized data.
         $mergedData = array_replace_recursive($this->translatableData, $this->localizedData);
 
         // Unset fields that shouldn't be translated.
-        $this->dataToTranslate = $this->unsetSpecialFields($mergedData);
+        return $this->unsetSpecialFields($mergedData);
     }
 
     /**
-     * Get the fields based on "localizable: true".
+     * Get the type of content.
      *
-     * @return array
+     * @param mixed $class
+     * @return string
      */
-    protected function getLocalizableFields(): array
+    protected function contentType($class): string
     {
-        // Get all localizable fields.
-        $localizableFields = $this->data->blueprint()->fields()->localizable()->all();
-
-        // Add the title field, so it can be translated.
-        if ($this->contentType !== 'GlobalsSet' && ! $localizableFields->has('title')) {
-            $localizableFields->put('title', [
-                'type' => 'text',
-            ]);
+        if ($class instanceof \Statamic\Globals\GlobalSet) {
+            return 'GlobalSet';
         }
 
-        return $localizableFields->toArray();
+        if ($class instanceof \Statamic\Entries\Entry) {
+            return 'Entry';
+        }
+
+        throw TranslationFailed::unsupportedContentType();
     }
 
     /**
-     * Unset fields that shouldn't be translated.
+     * Get the target language for translation.
      *
-     * @param array $array
-     * @return array
+     * @return string
      */
-    protected function unsetSpecialFields(array $array): array
+    protected function getTargetLanguage(): string
     {
-        // Slug translation will be handled separately
-        if ($this->contentType === 'Entry') {
-            unset($array['slug']);
-        }
-
-        unset($array['updated_by']);
-        unset($array['updated_at']);
-
-        return $array;
+        return Site::get($this->targetSite)->shortLocale();
     }
 
     /**
@@ -355,14 +347,28 @@ class Translator
     }
 
     /**
+     * Unset fields that shouldn't be translated.
+     *
+     * @param array $array
+     * @return array
+     */
+    protected function unsetSpecialFields(array $array): array
+    {
+        unset($array['updated_by']);
+        unset($array['updated_at']);
+
+        return $array;
+    }
+
+    /**
      * Translate the data.
      *
-     * @return void
+     * @return array
      */
-    protected function translateData(): void
+    protected function translateData($data): array
     {
-        $this->translatedData = Utils::array_map_recursive(
-            $this->dataToTranslate,
+        return Utils::array_map_recursive(
+            $data,
             function ($value, $key) {
                 return $this->translate($value, $key);
             }
@@ -385,11 +391,11 @@ class Translator
 
         // Translate HTML
         if (Utils::isHtml($value)) {
-            return $this->service->translateText($value, $this->targetLocale, 'html');
+            return $this->service->translateText($value, $this->targetLanguage, 'html');
         }
 
         // Translate text
-        return $this->service->translateText($value, $this->targetLocale, 'text');
+        return $this->service->translateText($value, $this->targetLanguage, 'text');
     }
 
     /**
@@ -427,7 +433,7 @@ class Translator
         }
 
         // Skip if $value is in the target locale.
-        if ($this->service->detectLanguage($value) === $this->targetLocale) {
+        if ($this->service->detectLanguage($value) === $this->targetLanguage) {
             return false;
         }
 
@@ -435,55 +441,18 @@ class Translator
     }
 
     /**
-     * Translate the slug.
+     * Returns a translated or untranslated slug.
      *
-     * @return void
+     * @return string
      */
-    protected function translateSlug(): void
+    protected function slug(): string
     {
-        if ($this->slugShouldBeTranslated()) {
-            // Deslugged slug from the unlocalized default content.
-            $desluggedSlug = Str::deslugify($this->data->slug());
+        $slug = $this->entry->slug();
 
-            // Translate the deslugged slug.
-            $translation = $this->service->translateText($desluggedSlug, $this->targetLocale, 'text');
-
-            // Save the translated slug to the translated content.
-            $this->translatedData['slug'] = Str::slug($translation);
-        }
-    }
-
-    /**
-     * Determine if the slug should be translated.
-     *
-     * @return bool
-     */
-    protected function slugShouldBeTranslated(): bool
-    {
-        // Globals shouldn't have a slug saved to file.
-        if ($this->contentType === 'GlobalSet') {
-            return false;
+        if (! array_key_exists('slug', $this->translatableFields)) {
+            return $slug;
         }
 
-        // Return false if the slug has already been localized.
-        if (array_key_exists('slug', $this->localizedData)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Save the translation to file.
-     *
-     * @return void
-     */
-    protected function saveTranslation(): void
-    {
-        foreach ($this->translatedData as $key => $value) {
-            $this->data->in($this->targetSite)->set($key, $value);
-        }
-
-        $this->data->in($this->targetSite)->save();
+        return $this->service->translateText(Str::deslugify($slug), $this->targetLanguage, 'text');
     }
 }
