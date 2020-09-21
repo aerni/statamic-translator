@@ -2,10 +2,10 @@
 
 namespace Aerni\Translator;
 
+use Exception;
 use Illuminate\Http\Request;
-use Aerni\Translator\Data\Translator;
-use Illuminate\Support\Facades\App;
 use Aerni\Translator\RequestValidator;
+use Aerni\Translator\Data\TranslateData;
 use Symfony\Component\HttpFoundation\Response;
 use Aerni\Translator\Exceptions\TranslationFailed;
 
@@ -20,13 +20,9 @@ class TranslatorProcessor
 
     public function process()
     {
-        $this
+        return $this
             ->ensureValidRequest()
             ->processTranslation();
-
-        // TODO: Add exception handling like in the old controller.
-
-        return $this->createResponse();
     }
 
     protected function ensureValidRequest(): self
@@ -40,20 +36,30 @@ class TranslatorProcessor
         return $this;
     }
 
-    protected function processTranslation(): self
+    protected function processTranslation(): Response
     {
-        App::makeWith(Translator::class, [
-            'id' => $this->request->id,
-            'targetSite' => $this->request->targetSite
-        ])->process();
+        try {
+            (new TranslateData($this->request->id, $this->request->targetSite))
+                ->translate()
+                ->save();
+        } catch (Exception $e) {
+            return $this->errorResponse($e);
+        }
 
-        return $this;
+        return $this->successResponse();
     }
 
-    protected function createResponse(): Response
+    protected function successResponse(): Response
     {
         return response()->json([
             'message' => __('translator::fieldtypes.translator.vue_component.success'),
         ], 200);
+    }
+
+    protected function errorResponse(Exception $e): Response
+    {
+        return response()->json([
+            'error' => json_decode($e->getMessage(), true)['error']
+        ], $e->getCode());
     }
 }
