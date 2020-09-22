@@ -27,11 +27,7 @@ class TranslatorProcessor
 
     protected function ensureValidRequest(): self
     {
-        $isValid = resolve(RequestValidator::class)->isValid($this->request);
-
-        if (! $isValid) {
-            throw TranslationFailed::invalidRequest();
-        }
+        RequestValidator::isValid($this->request);
 
         return $this;
     }
