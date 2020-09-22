@@ -4,7 +4,7 @@ namespace Aerni\Translator\Data\Concerns;
 
 use Statamic\Support\Str;
 use Statamic\Facades\Site;
-use Aerni\Translator\Utils;
+use Aerni\Translator\Support\Utils;
 use Facades\Aerni\Translator\Contracts\TranslationService;
 
 trait TranslatesData

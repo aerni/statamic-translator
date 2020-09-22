@@ -2,7 +2,7 @@
 
 namespace Aerni\Translator\Data\Concerns;
 
-use Aerni\Translator\Utils;
+use Aerni\Translator\Support\Utils;
 use Illuminate\Support\Collection;
 
 trait PreparesData

@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\Translator;
+namespace Aerni\Translator\Support;
 
 class Utils
 {

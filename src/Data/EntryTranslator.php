@@ -3,7 +3,7 @@
 namespace Aerni\Translator\Data;
 
 use Aerni\Translator\Data\BasicTranslator;
-use Aerni\Translator\RequestValidator;
+use Aerni\Translator\Support\RequestValidator;
 use Illuminate\Support\Collection;
 
 class EntryTranslator extends BasicTranslator

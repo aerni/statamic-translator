@@ -1,6 +1,6 @@
 <?php
 
-namespace Aerni\Translator;
+namespace Aerni\Translator\Support;
 
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
