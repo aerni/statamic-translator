@@ -24,7 +24,7 @@ class DataTranslator implements Translator
         $entry = Data::find($this->id);
 
         if ($entry instanceof \Statamic\Entries\Entry) {
-            return (new CollectionEntryTranslator($entry, $this->targetSite))
+            return (new EntryTranslator($entry, $this->targetSite))
                 ->process();
         }
 

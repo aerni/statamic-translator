@@ -6,7 +6,7 @@ use Aerni\Translator\Data\BasicTranslator;
 use Illuminate\Support\Collection;
 use Statamic\Entries\Entry;
 
-class CollectionEntryTranslator extends BasicTranslator
+class EntryTranslator extends BasicTranslator
 {
     public function process(): Entry
     {
