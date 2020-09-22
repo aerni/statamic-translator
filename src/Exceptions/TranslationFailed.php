@@ -11,9 +11,9 @@ class TranslationFailed extends Exception
         return new static('The translation request is invalid.');
     }
 
-    public static function invalidTargetSite(): TranslationFailed
+    public static function invalidSite(): TranslationFailed
     {
-        return new static('The requested target site does not exists.');
+        return new static('The requested site does not exists.');
     }
 
     public static function invalidId(): TranslationFailed
@@ -21,9 +21,9 @@ class TranslationFailed extends Exception
         return new static('The requested id does not exists.');
     }
 
-    public static function missingTargetSite(): TranslationFailed
+    public static function missingSite(): TranslationFailed
     {
-        return new static('The target site is missing.');
+        return new static('The site is missing.');
     }
 
     public static function missingId(): TranslationFailed

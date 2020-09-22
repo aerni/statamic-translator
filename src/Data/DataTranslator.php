@@ -2,21 +2,19 @@
 
 namespace Aerni\Translator\Data;
 
-use Statamic\Facades\Data;
 use Aerni\Translator\Contracts\Translator;
-use Aerni\Translator\Data\CollectionEntryTranslator;
-use Aerni\Translator\Data\GlobalSetTranslator;
 use Aerni\Translator\Exceptions\TranslationFailed;
+use Statamic\Facades\Data;
 
 class DataTranslator implements Translator
 {
     protected $id;
-    protected $targetSite;
+    protected $site;
 
-    public function __construct(string $id, string $targetSite)
+    public function __construct(string $id, string $site)
     {
         $this->id = $id;
-        $this->targetSite = $targetSite;
+        $this->site = $site;
     }
 
     public function process()
@@ -24,12 +22,12 @@ class DataTranslator implements Translator
         $entry = Data::find($this->id);
 
         if ($entry instanceof \Statamic\Entries\Entry) {
-            return (new EntryTranslator($entry, $this->targetSite))
+            return (new EntryTranslator($entry, $this->site))
                 ->process();
         }
 
         if ($entry instanceof \Statamic\Globals\GlobalSet) {
-            return (new GlobalSetTranslator($entry, $this->targetSite))
+            return (new GlobalSetTranslator($entry, $this->site))
                 ->process();
         }
 

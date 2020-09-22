@@ -3,17 +3,22 @@
 namespace Aerni\Translator\Data;
 
 use Aerni\Translator\Data\BasicTranslator;
+use Aerni\Translator\RequestValidator;
 use Illuminate\Support\Collection;
-use Statamic\Entries\Entry;
 
 class EntryTranslator extends BasicTranslator
 {
-    public function process(): Entry
+    protected function ensureCanProcess(): self
+    {
+        RequestValidator::canProcessEntry($this->entry, $this->site);
+
+        return $this;
+    }
+
+    protected function translate(): void
     {
         $this->entry->data($this->translatedData())
             ->slug($this->slug());
-
-        return $this->entry;
     }
 
     protected function rootData(): Collection

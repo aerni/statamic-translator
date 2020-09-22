@@ -2,12 +2,10 @@
 
 namespace Aerni\Translator;
 
-use Exception;
-use Illuminate\Http\Request;
 use Aerni\Translator\RequestValidator;
 use Aerni\Translator\Data\DataTranslator;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Aerni\Translator\Exceptions\TranslationFailed;
 
 class TranslatorProcessor
 {
@@ -18,11 +16,13 @@ class TranslatorProcessor
         $this->request = $request;
     }
 
-    public function process()
+    public function process(): Response
     {
-        return $this
+        $this
             ->ensureValidRequest()
-            ->processTranslation();
+            ->translateData();
+
+        return $this->successResponse();
     }
 
     protected function ensureValidRequest(): self
@@ -32,17 +32,11 @@ class TranslatorProcessor
         return $this;
     }
 
-    protected function processTranslation(): Response
+    protected function translateData(): void
     {
-        try {
-            (new DataTranslator($this->request->id, $this->request->targetSite))
-                ->process()
-                ->save();
-        } catch (Exception $e) {
-            return $this->errorResponse($e);
-        }
-
-        return $this->successResponse();
+        (new DataTranslator($this->request->id, $this->request->site))
+            ->process()
+            ->save();
     }
 
     protected function successResponse(): Response
@@ -50,12 +44,5 @@ class TranslatorProcessor
         return response()->json([
             'message' => __('translator::fieldtypes.translator.vue_component.success'),
         ], 200);
-    }
-
-    protected function errorResponse(Exception $e): Response
-    {
-        return response()->json([
-            'error' => json_decode($e->getMessage(), true)['error']
-        ], $e->getCode());
     }
 }

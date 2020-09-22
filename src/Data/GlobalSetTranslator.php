@@ -3,17 +3,22 @@
 namespace Aerni\Translator\Data;
 
 use Aerni\Translator\Data\BasicTranslator;
+use Aerni\Translator\RequestValidator;
 use Illuminate\Support\Collection;
-use Statamic\Globals\GlobalSet;
 
 class GlobalSetTranslator extends BasicTranslator
 {
-    public function process(): GlobalSet
+    protected function ensureCanProcess(): self
     {
-        $this->entry->in($this->targetSite)
-            ->data($this->translatedData());
+        RequestValidator::canProcessGlobalSet($this->entry, $this->site);
 
-        return $this->entry;
+        return $this;
+    }
+
+    protected function translate(): void
+    {
+        $this->entry->in($this->site)
+            ->data($this->translatedData());
     }
 
     protected function rootData(): Collection
@@ -23,6 +28,6 @@ class GlobalSetTranslator extends BasicTranslator
 
     protected function localizedData(): Collection
     {
-        return $this->entry->in($this->targetSite)->data();
+        return $this->entry->in($this->site)->data();
     }
 }

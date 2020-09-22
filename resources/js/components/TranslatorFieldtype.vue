@@ -147,9 +147,9 @@ export default {
             this.translating = true;
             this.translated = false;
 
-            axios.post('/cp/translator/translate', {
+            axios.post('/cp/translator', {
                 id: this.id,
-                targetSite: this.site,
+                site: this.site,
             })
             .then(response => {
                 this.idle = false,
@@ -161,8 +161,8 @@ export default {
                 this.idle = false;
                 this.translating = false;
                 this.translated = false;
-                this.error = error.response.data.error;
-                console.log(error.response.data.error);
+                this.error = error.response.data;
+                console.log(error.response.data);
             });
         },
 

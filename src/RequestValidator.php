@@ -4,7 +4,9 @@ namespace Aerni\Translator;
 
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
+use Statamic\Entries\Entry;
 use Illuminate\Http\Request;
+use Statamic\Globals\GlobalSet;
 use Aerni\Translator\Exceptions\TranslationFailed;
 
 class RequestValidator
@@ -14,8 +16,8 @@ class RequestValidator
      * to process the translation.
      *
      * @param Request $request
-     * @throws TranslationFailed
      * @return bool
+     * @throws TranslationFailed
      */
     public static function isValid(Request $request): bool
     {
@@ -27,12 +29,50 @@ class RequestValidator
             throw TranslationFailed::invalidId();
         }
 
-        if (! $request->targetSite) {
-            throw TranslationFailed::missingTargetSite();
+        if (! $request->site) {
+            throw TranslationFailed::missingSite();
         }
 
-        if (! Site::get($request->targetSite)) {
-            throw TranslationFailed::invalidTargetSite();
+        if (! Site::get($request->site)) {
+            throw TranslationFailed::invalidSite();
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if an entry can be translated.
+     *
+     * @param Entry $entry
+     * @param string $site
+     * @return bool
+     * @throws TranslationFailed
+     */
+    public static function canProcessEntry(Entry $entry, string $site): bool
+    {
+        if ($entry->isRoot()) {
+            throw TranslationFailed::canNotTranslateRoot();
+        }
+
+        if ($entry->locale() !== $site) {
+            throw TranslationFailed::canNotTranslateRoot();
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if a global set can be translated.
+     *
+     * @param GlobalSet $entry
+     * @param string $site
+     * @return bool
+     * @throws TranslationFailed
+     */
+    public static function canProcessGlobalSet(GlobalSet $entry, string $site): bool
+    {
+        if ($entry->localizations()->get($site)->origin() === null) {
+            throw TranslationFailed::canNotTranslateRoot();
         }
 
         return true;

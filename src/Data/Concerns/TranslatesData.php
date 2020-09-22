@@ -46,7 +46,7 @@ trait TranslatesData
      */
     protected function targetLanguage(): string
     {
-        return Site::get($this->targetSite)->shortLocale();
+        return Site::get($this->site)->shortLocale();
     }
 
     protected function slug(): string
@@ -57,7 +57,7 @@ trait TranslatesData
             return $slug;
         }
 
-        return $this->service->translateText(Str::deslugify($slug), $this->targetLanguage(), 'text');
+        return TranslationService::translateText(Str::deslugify($slug), $this->targetLanguage(), 'text');
     }
 
     /**
