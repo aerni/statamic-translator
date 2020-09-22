@@ -19,6 +19,11 @@ trait PreparesData
         return $this->filterSupportedFieldtypes($this->localizableFields());
     }
 
+    /**
+     * Get the blueprint fields that are localizable.
+     *
+     * @return array
+     */
     protected function localizableFields(): array
     {
         return $this->entry->blueprint()
