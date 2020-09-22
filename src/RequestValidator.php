@@ -5,6 +5,7 @@ namespace Aerni\Translator;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Illuminate\Http\Request;
+use Aerni\Translator\Exceptions\TranslationFailed;
 
 class RequestValidator
 {
@@ -13,24 +14,25 @@ class RequestValidator
      * to process the translation.
      *
      * @param Request $request
+     * @throws TranslationFailed
      * @return bool
      */
-    public function isValid(Request $request): bool
+    public static function isValid(Request $request): bool
     {
         if (! $request->id) {
-            return false;
+            throw TranslationFailed::missingId();
         }
 
         if (! Data::find($request->id)) {
-            return false;
+            throw TranslationFailed::invalidId();
         }
 
         if (! $request->targetSite) {
-            return false;
+            throw TranslationFailed::missingTargetSite();
         }
 
         if (! Site::get($request->targetSite)) {
-            return false;
+            throw TranslationFailed::invalidTargetSite();
         }
 
         return true;
