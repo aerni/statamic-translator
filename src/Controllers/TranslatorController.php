@@ -1,13 +1,11 @@
 <?php
 
-namespace Aerni\Translator;
+namespace Aerni\Translator\Controllers;
 
-use Exception;
 use Illuminate\Http\Request;
-use Aerni\Translator\Data\TranslateData;
 use Aerni\Translator\TranslatorProcessor;
 
-class TranslatorController
+class TranslatorController extends ApiController
 {
     public function __invoke(Request $request)
     {
