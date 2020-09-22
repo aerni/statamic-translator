@@ -5,13 +5,10 @@ namespace Aerni\Translator\Data\Concerns;
 use Statamic\Support\Str;
 use Statamic\Facades\Site;
 use Aerni\Translator\Utils;
-use Aerni\Translator\Data\Concerns\TranslatorGuards;
 use Facades\Aerni\Translator\Contracts\TranslationService;
 
 trait TranslatesData
 {
-    use TranslatorGuards;
-
     protected function translatedData(): array
     {
         return Utils::array_map_recursive(
@@ -43,7 +40,6 @@ trait TranslatesData
     }
 
     /**
-     * TODO: Implement caching.
      * Get the language for translation.
      *
      * @return string
@@ -62,5 +58,44 @@ trait TranslatesData
         }
 
         return $this->service->translateText(Str::deslugify($slug), $this->targetLanguage(), 'text');
+    }
+
+    /**
+     * Check if a key-value pair should be translated.
+     *
+     * @param mixed $value
+     * @param string $key
+     * @return bool
+     */
+    protected function isTranslatableKeyValuePair($value, string $key): bool
+    {
+        if (empty($value)) {
+            return false;
+        }
+
+        if (is_numeric($value)) {
+            return false;
+        }
+
+        if (is_bool($value)) {
+            return false;
+        }
+
+        // Skip 'type: $value', where $value is a Bard/Replicator set key.
+        if ($key === 'type' && Utils::array_key_exists_recursive($value, $this->fieldKeys()['setKeys'])) {
+            return false;
+        }
+
+        // Skip if $key doesn't exists in the fieldset.
+        if (! Utils::array_key_exists_recursive($key, $this->fieldKeys()['allKeys']) && ! is_numeric($key)) {
+            return false;
+        }
+
+        // Skip if $value is in the target locale.
+        if (TranslationService::detectLanguage($value) === $this->targetLanguage()) {
+            return false;
+        }
+
+        return true;
     }
 }
