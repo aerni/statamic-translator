@@ -10,25 +10,27 @@ use Aerni\Translator\Exceptions\TranslationFailed;
 
 class DataTranslator implements Translator
 {
-    protected $entry;
+    protected $id;
     protected $targetSite;
 
     public function __construct(string $id, string $targetSite)
     {
-        $this->entry = Data::find($id);
+        $this->id = $id;
         $this->targetSite = $targetSite;
     }
 
-    public function translate()
+    public function process()
     {
-        if ($this->entry instanceof \Statamic\Entries\Entry) {
-            return (new CollectionEntryTranslator($this->entry, $this->targetSite))
-                ->translate();
+        $entry = Data::find($this->id);
+
+        if ($entry instanceof \Statamic\Entries\Entry) {
+            return (new CollectionEntryTranslator($entry, $this->targetSite))
+                ->process();
         }
 
-        if ($this->entry instanceof \Statamic\Globals\GlobalSet) {
-            return (new GlobalSetTranslator($this->entry, $this->targetSite))
-                ->translate();
+        if ($entry instanceof \Statamic\Globals\GlobalSet) {
+            return (new GlobalSetTranslator($entry, $this->targetSite))
+                ->process();
         }
 
         TranslationFailed::unsupportedContentType();

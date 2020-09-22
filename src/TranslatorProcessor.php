@@ -40,7 +40,7 @@ class TranslatorProcessor
     {
         try {
             (new DataTranslator($this->request->id, $this->request->targetSite))
-                ->translate()
+                ->process()
                 ->save();
         } catch (Exception $e) {
             return $this->errorResponse($e);

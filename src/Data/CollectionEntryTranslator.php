@@ -8,13 +8,7 @@ use Statamic\Entries\Entry;
 
 class CollectionEntryTranslator extends BasicTranslator
 {
-    public function __construct(Entry $entry, string $targetSite)
-    {
-        $this->entry = $entry;
-        $this->targetSite = $targetSite;
-    }
-
-    public function translate(): Entry
+    public function process(): Entry
     {
         $this->entry->data($this->translatedData())
             ->slug($this->slug());

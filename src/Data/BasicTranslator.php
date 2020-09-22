@@ -14,7 +14,13 @@ abstract class BasicTranslator implements Translator
     protected $entry;
     protected $targetSite;
 
-    abstract public function translate();
+    public function __construct($entry, string $targetSite)
+    {
+        $this->entry = $entry;
+        $this->targetSite = $targetSite;
+    }
+
+    abstract public function process();
 
     abstract protected function rootData(): Collection;
 

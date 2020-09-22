@@ -8,13 +8,7 @@ use Statamic\Globals\GlobalSet;
 
 class GlobalSetTranslator extends BasicTranslator
 {
-    public function __construct(GlobalSet $entry, string $targetSite)
-    {
-        $this->entry = $entry;
-        $this->targetSite = $targetSite;
-    }
-
-    public function translate(): GlobalSet
+    public function process(): GlobalSet
     {
         $this->entry->in($this->targetSite)
             ->data($this->translatedData());
