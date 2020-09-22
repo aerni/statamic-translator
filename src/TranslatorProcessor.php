@@ -5,7 +5,7 @@ namespace Aerni\Translator;
 use Exception;
 use Illuminate\Http\Request;
 use Aerni\Translator\RequestValidator;
-use Aerni\Translator\Data\TranslateData;
+use Aerni\Translator\Data\DataTranslator;
 use Symfony\Component\HttpFoundation\Response;
 use Aerni\Translator\Exceptions\TranslationFailed;
 
@@ -39,7 +39,7 @@ class TranslatorProcessor
     protected function processTranslation(): Response
     {
         try {
-            (new TranslateData($this->request->id, $this->request->targetSite))
+            (new DataTranslator($this->request->id, $this->request->targetSite))
                 ->translate()
                 ->save();
         } catch (Exception $e) {

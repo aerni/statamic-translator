@@ -2,7 +2,7 @@
 
 namespace Aerni\Translator\Contracts;
 
-interface TranslateData
+interface Translator
 {
     /**
      * Translate a collection entry or global set.

@@ -3,12 +3,12 @@
 namespace Aerni\Translator\Data;
 
 use Statamic\Facades\Data;
-use Aerni\Translator\Contracts\TranslateData as TranslateDataContract;
-use Aerni\Translator\Data\TranslateCollectionEntry;
-use Aerni\Translator\Data\TranslateGlobalSet;
+use Aerni\Translator\Contracts\Translator;
+use Aerni\Translator\Data\CollectionEntryTranslator;
+use Aerni\Translator\Data\GlobalSetTranslator;
 use Aerni\Translator\Exceptions\TranslationFailed;
 
-class TranslateData implements TranslateDataContract
+class DataTranslator implements Translator
 {
     protected $entry;
     protected $targetSite;
@@ -22,12 +22,12 @@ class TranslateData implements TranslateDataContract
     public function translate()
     {
         if ($this->entry instanceof \Statamic\Entries\Entry) {
-            return (new TranslateCollectionEntry($this->entry, $this->targetSite))
+            return (new CollectionEntryTranslator($this->entry, $this->targetSite))
                 ->translate();
         }
 
         if ($this->entry instanceof \Statamic\Globals\GlobalSet) {
-            return (new TranslateGlobalSet($this->entry, $this->targetSite))
+            return (new GlobalSetTranslator($this->entry, $this->targetSite))
                 ->translate();
         }
 

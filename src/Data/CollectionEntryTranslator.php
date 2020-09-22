@@ -2,11 +2,11 @@
 
 namespace Aerni\Translator\Data;
 
-use Aerni\Translator\Data\Translator;
+use Aerni\Translator\Data\BasicTranslator;
 use Illuminate\Support\Collection;
 use Statamic\Entries\Entry;
 
-class TranslateCollectionEntry extends Translator
+class CollectionEntryTranslator extends BasicTranslator
 {
     public function __construct(Entry $entry, string $targetSite)
     {

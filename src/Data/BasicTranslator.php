@@ -2,11 +2,12 @@
 
 namespace Aerni\Translator\Data;
 
+use Illuminate\Support\Collection;
+use Aerni\Translator\Contracts\Translator;
 use Aerni\Translator\Data\Concerns\PreparesData;
 use Aerni\Translator\Data\Concerns\TranslatesData;
-use Illuminate\Support\Collection;
 
-abstract class Translator
+abstract class BasicTranslator implements Translator
 {
     use PreparesData, TranslatesData;
 

@@ -2,12 +2,11 @@
 
 namespace Aerni\Translator\Data;
 
-use Aerni\Translator\Contracts\TranslateData;
-use Aerni\Translator\Data\Translator;
+use Aerni\Translator\Data\BasicTranslator;
 use Illuminate\Support\Collection;
 use Statamic\Globals\GlobalSet;
 
-class TranslateGlobalSet extends Translator implements TranslateData
+class GlobalSetTranslator extends BasicTranslator
 {
     public function __construct(GlobalSet $entry, string $targetSite)
     {
