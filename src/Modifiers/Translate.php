@@ -2,9 +2,10 @@
 
 namespace Aerni\Translator\Modifiers;
 
-use Facades\Aerni\Translator\Contracts\TranslationService;
-use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Site;
 use Statamic\Modifiers\Modifier;
+use Illuminate\Support\Facades\Cache;
+use Facades\Aerni\Translator\Contracts\TranslationService;
 
 class Translate extends Modifier
 {
@@ -17,14 +18,26 @@ class Translate extends Modifier
      */
     public function index($value, $params): string
     {
-        $targetLocale = array_get($params, 0);
+        $locale = array_get($params, 0) ?? Site::current()->shortLocale();
 
-        if (is_null($targetLocale)) {
+        return $this->translate($value, $locale);
+    }
+
+    /**
+     * Translate the value.
+     *
+     * @param string $value
+     * @param string $locale
+     * @return string
+     */
+    protected function translate(string $value, string $locale): string
+    {
+        if ($locale === Site::default()->shortLocale()) {
             return $value;
         }
 
-        return Cache::rememberForever("{$value}_{$targetLocale}", function () use ($value, $targetLocale) {
-            return TranslationService::translateText($value, $targetLocale);
+        return Cache::rememberForever("{$value}_{$locale}", function () use ($value, $locale) {
+            return TranslationService::translateText($value, $locale);
         });
     }
 }
