@@ -2,10 +2,9 @@
 
 namespace Aerni\Translator\Data;
 
-use Statamic\Facades\Data;
 use Aerni\Translator\Contracts\Translator;
 use Aerni\Translator\Support\RequestValidator;
-use Aerni\Translator\Exceptions\TranslationFailed;
+use Statamic\Facades\Data;
 
 class DataTranslator implements Translator
 {
