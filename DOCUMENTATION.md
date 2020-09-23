@@ -73,11 +73,11 @@ GOOGLE_APPLICATION_CREDENTIALS=********************************
 ```
 
 ## Basic Usage
-1. Add the `Translator` fieldtype to your blueprint and make it `localizable`.
-2. Make all fields `localizable` that you want to translate.
-3. Navigate to the content you want to translate.
-4. Select the locale you want to translate into.
-5. Hit the Translator `Translate Content` button and wait for the translation to finish.
+1. Add the `Translator` fieldtype to your blueprint.
+2. Make sure to add `localizable: true` to the fields you want to translate.
+3. Navigate to the Entry, Term or Global you want to translate.
+4. Select the site you want to translate.
+5. Hit the `Translate Content` button and wait for the translation to finish.
 
 > **Important:** Give each field in your blueprint a unique handle. This will make sure that Translator only translates supported fields.
 
@@ -87,7 +87,7 @@ The following fieldtypes are supported for translation: `array`, `bard`, `grid`,
 > **Note:** The `array` fieldtype can only be translated when the keys are predefined.
 
 ### Supported Content Types
-Translator works with `Collections` and `Globals`.
+Translator works with `Collections`, `Taxonomies` and `Globals`.
 
 ### Translator Fieldtype Options
 You may customize the text of the "Translate Content" button by adding `button_label: My very special button text` to the Translator field in your blueprint. You can also customize the label in the blueprint editor in the CP.

@@ -8,6 +8,7 @@ use Statamic\Entries\Entry;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Globals\GlobalSet;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class RequestValidator
 {
@@ -57,6 +58,10 @@ class RequestValidator
             return true;
         }
 
+        if ($entry instanceof \Statamic\Taxonomies\LocalizedTerm) {
+            return true;
+        }
+
         throw TranslationFailed::unsupportedContentType();
     }
 
@@ -92,6 +97,23 @@ class RequestValidator
     public static function canProcessGlobalSet(GlobalSet $entry, string $site): bool
     {
         if ($entry->localizations()->get($site)->origin() === null) {
+            throw TranslationFailed::canNotTranslateRoot();
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if a term can be translated.
+     *
+     * @param LocalizedTerm $entry
+     * @param string $site
+     * @return bool
+     * @throws TranslationFailed
+     */
+    public static function canProcessTerm(LocalizedTerm $entry, string $site): bool
+    {
+        if ($entry->locale() === $site) {
             throw TranslationFailed::canNotTranslateRoot();
         }
 

@@ -45,5 +45,10 @@ class DataTranslator implements Translator
             return (new GlobalSetTranslator($this->entry, $this->site))
                 ->process();
         }
+
+        if ($this->entry instanceof \Statamic\Taxonomies\LocalizedTerm) {
+            return (new TermTranslator($this->entry, $this->site))
+                ->process();
+        }
     }
 }
