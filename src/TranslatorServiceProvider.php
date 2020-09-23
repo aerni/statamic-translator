@@ -16,6 +16,10 @@ class TranslatorServiceProvider extends AddonServiceProvider
         Modifiers\Translate::class,
     ];
 
+    protected $tags = [
+        Tags\Translate::class,
+    ];
+
     protected $fieldtypes = [
         Fieldtypes\Translator::class,
     ];
