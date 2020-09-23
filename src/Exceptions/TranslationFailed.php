@@ -40,4 +40,9 @@ class TranslationFailed extends Exception
     {
         return new static('Can not translate the root locale.');
     }
+
+    public static function canNotTranslateSameLocale(): TranslationFailed
+    {
+        return new static('Can not translate. The root and target locale are the same.');
+    }
 }

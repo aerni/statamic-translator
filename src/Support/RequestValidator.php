@@ -79,8 +79,8 @@ class RequestValidator
             throw TranslationFailed::canNotTranslateRoot();
         }
 
-        if ($entry->locale() !== $site) {
-            throw TranslationFailed::canNotTranslateRoot();
+        if ($entry->locale() === $site) {
+            throw TranslationFailed::canNotTranslateSameLocale();
         }
 
         return true;
@@ -96,7 +96,7 @@ class RequestValidator
      */
     public static function canProcessGlobalSet(GlobalSet $entry, string $site): bool
     {
-        if ($entry->localizations()->get($site)->origin() === null) {
+        if ($entry->in($site)->origin() === null) {
             throw TranslationFailed::canNotTranslateRoot();
         }
 
