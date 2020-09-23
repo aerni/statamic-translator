@@ -1,39 +1,70 @@
 ## Installation
+Install the addon using Composer.
 
-1. Copy the `Translator` folder into `site/addons/`.
-2. Run `php please update:addons`.
-3. Configure your prefered translation service in the settings.
-
-***
-
-## Translation Services
-Translator uses `Google Cloud Translation` for translation. You can choose between the `Basic` and `Advanced` Cloud Translation edition. They both deliver the same translation. Which one you choose really comes down to personal preference. The `Basic` edition can be set up using a simple `API Key`, while the set up of the `Advanced` edition is a little bit more complicated.
-
-> Learn more about [Google Cloud Translation](https://cloud.google.com/translate/docs).
-
-***
-
-## Requirements
-1. At least two locales set up in your Statamic installation.
-2. The locale shorthands have to be `ISO-639-1` language codes.
-
-> Here's a [complete list of supported languages](https://cloud.google.com/translate/docs/languages) and their `ISO-639-1` language codes.
-
-***
-
-## Configuration
-Head to `Configure -> Addons -> Translator` in the CP and configure your prefered translation service. 
-
-The addon is pre-configured to use `Google Cloud Translation – Basic (v2)`. It will also get your authentication credentials from your `.env` file by default:
-
-```yaml
-translation_service: 'google_basic'
-google_translation_api_key: '{env:GOOGLE_TRANSLATION_API_KEY}'
-google_application_credentials: '{env:GOOGLE_APPLICATION_CREDENTIALS}'
-google_cloud_project: '{env:GOOGLE_CLOUD_PROJECT}'
+```bash
+composer require aerni/translator
 ```
 
-Set the necessary variables in your `.env` file:
+Publish the config of the package.
+
+```bash
+php please vendor:publish --tag=translator-config
+```
+
+The following config will be published to `config/translator.php`.
+
+```php
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Translation Service
+    |--------------------------------------------------------------------------
+    |
+    | Choose your prefered translation service.
+    | Possible values: 'google_basic', 'google_advanced'
+    |
+    */
+
+    'translation_service' => 'google_basic',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Google Translation API Key
+    |--------------------------------------------------------------------------
+    |
+    | Your Google Translation API Key. This only works with 'google_basic'.
+    |
+    */
+
+    'google_translation_api_key' => env('GOOGLE_TRANSLATION_API_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Google Application Credentials
+    |--------------------------------------------------------------------------
+    |
+    | The path to your application credentials json.
+    |
+    */
+
+    'google_application_credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Google Cloud Project
+    |--------------------------------------------------------------------------
+    |
+    | Your Google Cloud Project.
+    |
+    */
+
+    'google_cloud_project' => env('GOOGLE_CLOUD_PROJECT'),
+];
+```
+
+## Configuration
+Translator is pre-configured to use `Google Cloud Translation – Basic (v2)`. You can change your prefered service in the config. Set your authentication credentials in your `.env` file.
 
 ```env
 GOOGLE_TRANSLATION_API_KEY=********************************
@@ -41,42 +72,57 @@ GOOGLE_CLOUD_PROJECT=********************************
 GOOGLE_APPLICATION_CREDENTIALS=********************************
 ```
 
-> You can change the default config by creating `site/settings/addons/translator.yaml` and adding the desired config keys and values.
-
-***
-
 ## Basic Usage
-1. Add the `Translator` fieldtype to your fieldset and make it `localizable`.
+1. Add the `Translator` fieldtype to your blueprint and make it `localizable`.
 2. Make all fields `localizable` that you want to translate.
 3. Navigate to the content you want to translate.
 4. Select the locale you want to translate into.
 5. Hit the Translator `Translate Content` button and wait for the translation to finish.
 
-> **Important:** Give a unique name to each field variable in your fieldset. This will make sure that Translator only translates supported fields.
+> **Important:** Give each field in your blueprint a unique handle. This will make sure that Translator only translates supported fields.
 
 ### Supported Fieldtypes
-The following fieldtypes are supported for translation: `array`, `bard`, `grid`, `list`, `markdown`, `redactor`, `replicator`, `table`, `tags`, `text`, `textarea`.
+The following fieldtypes are supported for translation: `array`, `bard`, `grid`, `list`, `markdown`, `redactor`, `replicator`, `slug`, `table`, `tags`, `text`, `textarea`.
 
 > **Note:** The `array` fieldtype can only be translated when the keys are predefined.
 
 ### Supported Content Types
-Translator works with the following content types: `Pages`, `Collections`, `Taxonomies`, `Globals`
+Translator works with `Collections` and `Globals`.
 
 ### Translator Fieldtype Options
-You can customize the text of the "Translate Content" button by adding `button_text: New Button Text` to the Translator field in your fieldset. You can also customize the text when editing the fieldset in the CP.
+You may customize the text of the "Translate Content" button by adding `button_label: My very special button text` to the Translator field in your blueprint. You can also customize the label in the blueprint editor in the CP.
 
-***
+## Translate Modifier
+You can use the `translate` modifier to translate variables in your template. This can come in handy to translate fixed values and labels.
 
-## Modifier
-You can use the modifier to translate variables in your template. This can come in handy if you need to translate fixed values and labels.
-
-### Basic Usage
-Pass the target language as parameter to the modifier. The parameter has to be a supported `ISO-639-1` language code.
-
+Translate a variable into the language of the currently active site:
 ```html
-<!-- Translate {{ variable }} to German -->
-{{ variable | translator:de }}
+{{ variable | translate }}
+```
 
-<!-- Translate {{ variable }} to the current locale -->
-{{ variable translator="{{ locale }}" }}
+You can also pass the desired target language to the modifier. The parameter has to be a supported `ISO-639-1` language code.
+```html
+{{ variable | translate:de }}
+```
+
+## Translate Tag
+You may prefer to use the `translate` tag instead of the modifier.
+
+Translate a variable into the language of the currently active site:
+```html
+<!-- The nice shorthand syntax -->
+{{ translate:variable }}
+
+<!-- The regular syntax -->
+{{ translate :value="variable" }}
+```
+
+Translate any value instead of a variable:
+```html
+{{ translate value="This is a very special text!" }}
+```
+
+You can also pass the desired target language to the `locale` parameter. The value has to be a supported `ISO-639-1` language code.
+```html
+{{ translate:variable locale="de" }}
 ```
