@@ -18,11 +18,10 @@ class TranslatorProcessor
 
     public function process(): Response
     {
-        $this
+        return $this
             ->ensureValidRequest()
-            ->translateData();
-
-        return $this->successResponse();
+            ->translate()
+            ->successResponse();
     }
 
     protected function ensureValidRequest(): self
@@ -32,11 +31,13 @@ class TranslatorProcessor
         return $this;
     }
 
-    protected function translateData(): void
+    protected function translate(): self
     {
         (new DataTranslator($this->request->id, $this->request->site))
             ->process()
             ->save();
+
+        return $this;
     }
 
     protected function successResponse(): Response

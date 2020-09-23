@@ -41,6 +41,26 @@ class RequestValidator
     }
 
     /**
+     * Check if an entry is a supported content type.
+     *
+     * @param mixed $entry
+     * @return bool
+     * @throws TranslationFailed
+     */
+    public static function isSupportedType($entry): bool
+    {
+        if ($entry instanceof \Statamic\Entries\Entry) {
+            return true;
+        }
+
+        if ($entry instanceof \Statamic\Globals\GlobalSet) {
+            return true;
+        }
+
+        throw TranslationFailed::unsupportedContentType();
+    }
+
+    /**
      * Check if an entry can be translated.
      *
      * @param Entry $entry

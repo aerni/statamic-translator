@@ -2,9 +2,10 @@
 
 namespace Aerni\Translator\Data;
 
-use Aerni\Translator\Contracts\Translator;
-use Aerni\Translator\Exceptions\TranslationFailed;
 use Statamic\Facades\Data;
+use Aerni\Translator\Contracts\Translator;
+use Aerni\Translator\Support\RequestValidator;
+use Aerni\Translator\Exceptions\TranslationFailed;
 
 class DataTranslator implements Translator
 {
@@ -19,18 +20,30 @@ class DataTranslator implements Translator
 
     public function process()
     {
-        $entry = Data::find($this->id);
+        $this->entry = Data::find($this->id);
 
-        if ($entry instanceof \Statamic\Entries\Entry) {
-            return (new EntryTranslator($entry, $this->site))
+        return $this
+            ->ensureSupportedType()
+            ->translate();
+    }
+
+    protected function ensureSupportedType(): self
+    {
+        RequestValidator::isSupportedType($this->entry);
+
+        return $this;
+    }
+
+    protected function translate()
+    {
+        if ($this->entry instanceof \Statamic\Entries\Entry) {
+            return (new EntryTranslator($this->entry, $this->site))
                 ->process();
         }
 
-        if ($entry instanceof \Statamic\Globals\GlobalSet) {
-            return (new GlobalSetTranslator($entry, $this->site))
+        if ($this->entry instanceof \Statamic\Globals\GlobalSet) {
+            return (new GlobalSetTranslator($this->entry, $this->site))
                 ->process();
         }
-
-        TranslationFailed::unsupportedContentType();
     }
 }
