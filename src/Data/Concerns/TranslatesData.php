@@ -2,10 +2,10 @@
 
 namespace Aerni\Translator\Data\Concerns;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Site;
 use Aerni\Translator\Support\Utils;
 use Facades\Aerni\Translator\Contracts\TranslationService;
+use Statamic\Facades\Site;
+use Statamic\Support\Str;
 
 trait TranslatesData
 {

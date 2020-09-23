@@ -56,9 +56,11 @@ trait PreparesData
                                 return count($set['fields']) > 0;
                             })
                             ->toArray();
+
                         break;
                     case 'grid':
                         $item['fields'] = $this->filterSupportedFieldtypes($item['fields'] ?? []);
+
                         break;
                 }
 
@@ -79,9 +81,11 @@ trait PreparesData
                 switch ($item['type']) {
                     case 'replicator':
                         return count($item['sets'] ?? []) > 0;
+
                         break;
                     case 'grid':
                         return count($item['fields'] ?? []) > 0;
+
                         break;
                     default:
                         break;
@@ -132,6 +136,7 @@ trait PreparesData
 
                             return $set['fields'];
                         })->put('text', []);
+
                     break;
 
                 case 'replicator':
@@ -141,18 +146,21 @@ trait PreparesData
 
                             return $set['fields'];
                         });
+
                     break;
 
                 case 'grid':
                     $item['fields'] = $this->getTranslatableFieldKeys($item['fields']);
 
                     return $item['fields'];
+
                     break;
 
                 case 'array':
                     if (array_key_exists('keys', $item)) {
                         return $item['keys'];
                     }
+
                     break;
 
             }
@@ -180,6 +188,7 @@ trait PreparesData
                             return $set['fields'];
                         })
                         ->put('text', []);
+
                     break;
 
                 case 'replicator':
@@ -189,6 +198,7 @@ trait PreparesData
 
                             return $set['fields'];
                         });
+
                     break;
 
             }

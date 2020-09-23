@@ -3,7 +3,6 @@
 namespace Aerni\Translator;
 
 use Illuminate\Http\Request;
-use Aerni\Translator\TranslatorProcessor;
 
 class TranslatorController
 {

@@ -2,8 +2,8 @@
 
 namespace Aerni\Translator;
 
-use Aerni\Translator\Support\RequestValidator;
 use Aerni\Translator\Data\DataTranslator;
+use Aerni\Translator\Support\RequestValidator;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 

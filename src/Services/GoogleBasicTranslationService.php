@@ -2,9 +2,9 @@
 
 namespace Aerni\Translator\Services;
 
-use Illuminate\Support\Facades\Cache;
-use Google\Cloud\Translate\V2\TranslateClient;
 use Aerni\Translator\Contracts\TranslationService;
+use Google\Cloud\Translate\V2\TranslateClient;
+use Illuminate\Support\Facades\Cache;
 
 class GoogleBasicTranslationService implements TranslationService
 {

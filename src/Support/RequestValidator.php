@@ -2,12 +2,12 @@
 
 namespace Aerni\Translator\Support;
 
+use Aerni\Translator\Exceptions\TranslationFailed;
+use Illuminate\Http\Request;
+use Statamic\Entries\Entry;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Entries\Entry;
-use Illuminate\Http\Request;
 use Statamic\Globals\GlobalSet;
-use Aerni\Translator\Exceptions\TranslationFailed;
 
 class RequestValidator
 {

@@ -2,10 +2,10 @@
 
 namespace Aerni\Translator\Tags;
 
-use Statamic\Tags\Tags;
-use Statamic\Facades\Site;
-use Illuminate\Support\Facades\Cache;
 use Facades\Aerni\Translator\Contracts\TranslationService;
+use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Site;
+use Statamic\Tags\Tags;
 
 class Translate extends Tags
 {

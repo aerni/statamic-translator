@@ -2,10 +2,10 @@
 
 namespace Aerni\Translator\Modifiers;
 
+use Facades\Aerni\Translator\Contracts\TranslationService;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Site;
 use Statamic\Modifiers\Modifier;
-use Illuminate\Support\Facades\Cache;
-use Facades\Aerni\Translator\Contracts\TranslationService;
 
 class Translate extends Modifier
 {

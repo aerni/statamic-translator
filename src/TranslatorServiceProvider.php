@@ -3,12 +3,12 @@
 namespace Aerni\Translator;
 
 use Aerni\Translator\Contracts\TranslationService;
-use Aerni\Translator\Services\GoogleBasicTranslationService;
 use Aerni\Translator\Services\GoogleAdvancedTranslationService;
+use Aerni\Translator\Services\GoogleBasicTranslationService;
 use Google\Cloud\Translate\V2\TranslateClient;
 use Google\Cloud\Translate\V3\TranslationServiceClient;
-use Statamic\Statamic;
 use Statamic\Providers\AddonServiceProvider;
+use Statamic\Statamic;
 
 class TranslatorServiceProvider extends AddonServiceProvider
 {
@@ -29,7 +29,7 @@ class TranslatorServiceProvider extends AddonServiceProvider
     ];
 
     protected $scripts = [
-        __DIR__.'/../resources/dist/js/translator.js'
+        __DIR__.'/../resources/dist/js/translator.js',
     ];
 
     public function boot(): void
