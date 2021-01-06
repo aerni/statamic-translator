@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@tailwindcss/ui": "^0.6.2",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "tailwindcss": "^1.8.10"
   }
 }
